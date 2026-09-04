@@ -60,11 +60,17 @@ def ingest(
     root = find_repo_root()
     pipeline = build_ingest_components(cfg, repo_root=root)
     out = report or (root / ".cache" / "ingestion_report.json")
-    result = pipeline.run(
-        paths=list(path) if path else None,
-        only_changed=only_changed,
-        report_path=out,
-    )
+    try:
+        result = pipeline.run(
+            paths=list(path) if path else None,
+            only_changed=only_changed,
+            report_path=out,
+        )
+    finally:
+        # Embedded Qdrant must be closed before interpreter shutdown; otherwise its
+        # finalizer can run after Python has torn down its import machinery.
+        pipeline.store.close()
+        pipeline.registry.close()
     typer.echo(
         f"collection={result.collection} indexed={result.indexed} "
         f"skipped={result.skipped} failed={len(result.failed)} chunks={result.chunks}"

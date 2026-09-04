@@ -104,7 +104,7 @@ class SentenceDenseEmbedder(BaseDenseEmbedder):
             self._model = SentenceTransformer(model_id, trust_remote_code=True, **kwargs)
         if max_seq_len is not None:
             self._model.max_seq_length = max_seq_len
-        dim = self._model.get_sentence_embedding_dimension()
+        dim = self._model.get_embedding_dimension()
         if dim is None:
             raise RuntimeError(f"embedder {model_id} did not report a dimension")
         self._dim = int(dim)
