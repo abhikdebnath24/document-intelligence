@@ -12,6 +12,7 @@ from docintel.data.corpus import normalize_stem
 from docintel.evaluation.gold import SpanMatcher, file_sha256, load_qa_set
 from docintel.evaluation.retrieval_metrics import aggregate, include_item, question_metrics
 from docintel.retrieval.factory import build_retrieval_pipeline
+from docintel.settings import load_settings
 
 
 class FinalistGateError(RuntimeError):
@@ -46,6 +47,7 @@ def run_retrieval_eval(
     scoped: bool = False,
 ) -> Path:
     root = repo_root or find_repo_root()
+    load_settings()
     if split not in {"dev", "test"}:
         raise ValueError(f"split must be dev or test, got {split!r}")
     if split == "test":

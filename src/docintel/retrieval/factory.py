@@ -19,6 +19,7 @@ from docintel.retrieval.retrievers import (
     SparseRetriever,
 )
 from docintel.retrieval.transforms import FilterExtractor, IdentityTransform
+from docintel.settings import hf_token
 
 _KNOWN_TRANSFORMS = frozenset({"filter_extractor", "multi_query", "hyde"})
 FUSIONS: Registry[BaseFusion] = Registry("fusion")
@@ -54,6 +55,7 @@ def build_retrieval_pipeline(
 ) -> RetrievalPipeline:
     ing = config.ingestion
     ret = config.retrieval
+    hf_token()
     if dense is None:
         dense = DENSE.create(ing.dense_embedder.name, **ing.dense_embedder.params)
     if sparse is None:

@@ -453,7 +453,7 @@ document-intelligence/
     retrieval/
       retrievers/ dense.py, sparse_bm25_inproc.py, qdrant_hybrid.py
       fusion/     rrf.py, dbsf.py, weighted.py
-      rerankers/  none.py (default), cross_encoder.py (optional mxbai-xsmall / bge),
+      rerankers/  none.py (default), cross_encoder.py (optional bge-base / bge-v2-m3),
                   listwise_jina.py, llm_reranker.py
       query_transforms/ multi_query.py, hyde.py, filter_extractor.py
       pipeline.py           # RetrievalPipeline(retriever, fusion, reranker, transforms)
@@ -625,7 +625,7 @@ retrieval:
   mode: hybrid                 # dense | sparse | hybrid
   k_candidates: 20
   fusion: {name: rrf, params: {k: 60}}
-  reranker: {name: none, params: {}}   # default off (latency). Ablation: mxbai_xsmall / bge_v2_m3
+  reranker: {name: none, params: {}}   # default off (latency). Ablation: bge_base / bge_v2_m3
   query_transforms: []         # [multi_query, hyde, filter_extractor]
   filters: {use_agreement_type: true}
 
@@ -847,9 +847,9 @@ Challenge requirement is hybrid vs dense-only (Q15). Fusion (RRF) satisfies that
 | Model | Params | Type | Query cost | Decision |
 |-------|--------|------|------------|----------|
 | `none` | | pass-through | 0 | **Default**. Hybrid RRF already reorders. Honest write-up: we measured rerank as an ablation, default stays off for latency |
-| `mixedbread-ai/mxbai-rerank-xsmall-v1` | ~70M | cross-encoder | ~10-20 ms / 20 pairs | Optional if you want one local rerank ablation that stays interactive |
+| `BAAI/bge-reranker-base` | ~278M | cross-encoder | ~20-40 ms / 20 pairs | Optional local rerank ablation |
 | `BAAI/bge-reranker-v2-m3` | 568M | cross-encoder | ~40-80 ms / 20 pairs | Optional; not default |
-| `Qwen/Qwen3-Reranker-0.6B`, `mxbai-rerank-base/large` | 0.6B+ | | slower | Optional |
+| `Qwen/Qwen3-Reranker-0.6B` | 0.6B+ | | slower | Optional |
 | `jinaai/jina-reranker-v3.5` | 0.6B | listwise | medium | Optional; CC-BY-NC |
 | LLM-as-reranker | API | listwise | 1-3 s | Rejected for default (latency + cost) |
 
@@ -1188,13 +1188,13 @@ COMMIT after each: `feat(ingest): pymupdf loader with page/bbox provenance and h
 
 Depends on: WS2, WS1. Estimated: 8h.
 
-Files: `src/docintel/retrieval/**`, `src/docintel/evaluation/retrieval_metrics.py`, `src/docintel/evaluation/experiment.py`, `scripts/run_retrieval_eval.py`, `scripts/make_results_table.py`, `configs/profiles/exp_dense_only.yaml`, `exp_sparse_only.yaml`, `exp_hybrid_rrf.yaml` (MUST); `exp_hybrid_dbsf.yaml`, `exp_hybrid_rerank_mxbai.yaml` (MAY), `tests/unit/test_fusion.py`, `tests/unit/test_retrieval_metrics.py`.
+Files: `src/docintel/retrieval/**`, `src/docintel/evaluation/retrieval_metrics.py`, `src/docintel/evaluation/experiment.py`, `scripts/run_retrieval_eval.py`, `scripts/make_results_table.py`, `configs/profiles/exp_dense_only.yaml`, `exp_sparse_only.yaml`, `exp_hybrid_rrf.yaml` (MUST); `exp_hybrid_dbsf.yaml`, `exp_hybrid_rerank_bge_base.yaml`, `exp_hybrid_rerank_bge.yaml` (MAY), `tests/unit/test_fusion.py`, `tests/unit/test_retrieval_metrics.py`.
 
 Tasks:
 
 1. Retrievers: `dense`, `sparse_bm25_inproc` (bm25s over chunk texts loaded from Qdrant payloads or a sidecar), `qdrant_hybrid` (server-side prefetch + fusion), `client_hybrid` (dense + sparse separately, fused in-process; needed to compare fusion variants).
 2. Fusion: `rrf(k)`, `dbsf`, `weighted(alpha)`.
-3. Rerankers: `none` (MUST default). `cross_encoder` wrapper MAY accept `mxbai-rerank-xsmall-v1` if one local rerank ablation is wanted. Do not load bge-reranker-v2-m3 / Qwen3 / jina / LLM-rerank as defaults.
+3. Rerankers: `none` (MUST default). `cross_encoder` wrapper MAY accept `BAAI/bge-reranker-base` or `BAAI/bge-reranker-v2-m3`. Do not load Qwen3 / jina / LLM-rerank as defaults.
 4. Query transforms: `filter_extractor` (LLM or regex pulls doc name / agreement type into Qdrant filter), `multi_query`, `hyde`.
 5. `RetrievalPipeline.retrieve(RetrievalQuery)` returns `RetrievedChunk`s with provenance per stage (for trace and error analysis).
 6. `retrieval_metrics.py`: P@k, R@k, hit@k, MRR, nDCG@k, any/all for multi-span; per-bucket and per-agreement-type aggregation.
@@ -1383,7 +1383,7 @@ All rows run on `qa_dev`. Finalists (typically rows 3 and 7, plus 4 if both embe
 | 3 | + hybrid RRF | MUST | L1 | Q15 fusion gain |
 | 4 | embedder nomic <-> openai-3-small (same chunker, + BM25) | SHOULD if both keys/models available | L1 | Q14 embedding comparison |
 | 5 | chunker -> one other (fixed 256 or section_aware) | SHOULD | L1 | Q13 chunk boundary |
-| 6 | + mxbai-rerank-xsmall (top-20 -> 8) | MAY | L1 | optional rerank; default stays `none` |
+| 6 | + bge-reranker-base or bge-reranker-v2-m3 (top-20 -> 10) | MAY | L1 | optional rerank; default stays `none` |
 | 7 | Agent: grader on/off, rewrite 0/1, verifier on | MUST one L2 pass | L2 | Q16 hallucination control |
 | 8 | Eval framework: RAGAS vs DeepEval on the same outputs | SHOULD | L2 | which judge to trust |
 

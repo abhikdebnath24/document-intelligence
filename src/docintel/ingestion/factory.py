@@ -18,6 +18,7 @@ from docintel.ingestion.loaders import PyMuPDFLoader, TxtLoader
 from docintel.ingestion.pipeline import IngestionPipeline
 from docintel.ingestion.qdrant_indexer import QdrantIndexer
 from docintel.ingestion.registry_store import DocumentRegistry
+from docintel.settings import hf_token
 
 LOADERS: Registry[BaseLoader] = Registry("loader")
 CHUNKERS: Registry[BaseChunker] = Registry("chunker")
@@ -46,6 +47,7 @@ def build_ingest_components(
     registry: DocumentRegistry | None = None,
 ) -> IngestionPipeline:
     ing = config.ingestion
+    hf_token()
     loader = LOADERS.create(ing.loader.name, **ing.loader.params)
     chunker = CHUNKERS.create(ing.chunker.name, **ing.chunker.params)
     if dense is None:

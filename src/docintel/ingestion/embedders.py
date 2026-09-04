@@ -8,7 +8,7 @@ from docintel.core.device import resolve_device
 from docintel.core.errors import MissingSecretError
 from docintel.core.interfaces import BaseDenseEmbedder, BaseSparseEncoder
 from docintel.core.types import SparseVector
-from docintel.settings import load_settings
+from docintel.settings import hf_token, load_settings
 
 
 def _l2_normalize(vec: list[float]) -> list[float]:
@@ -86,6 +86,7 @@ class SentenceDenseEmbedder(BaseDenseEmbedder):
     ) -> None:
         from sentence_transformers import SentenceTransformer
 
+        token = hf_token()
         self.model_id = model_id
         self.revision = revision
         self.batch_size = batch_size
@@ -95,6 +96,8 @@ class SentenceDenseEmbedder(BaseDenseEmbedder):
         kwargs: dict[str, object] = {"device": resolve_device(device)}
         if revision:
             kwargs["revision"] = revision
+        if token:
+            kwargs["token"] = token
         try:
             self._model = SentenceTransformer(model_id, **kwargs)
         except ValueError as exc:
@@ -203,6 +206,7 @@ class FastEmbedBM25(BaseSparseEncoder):
     def __init__(self, model_name: str = "Qdrant/bm25", **_: object) -> None:
         from fastembed import SparseTextEmbedding
 
+        hf_token()
         self._model = SparseTextEmbedding(model_name=model_name)
 
     def alias(self) -> str:

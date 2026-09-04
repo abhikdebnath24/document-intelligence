@@ -1,4 +1,4 @@
-# L1 MAY row. Same index_sig as gpu_default nomic ingest. Heavier CE than mxbai-xsmall.
+# L1 MAY row. Same index_sig as gpu_default nomic ingest. BAAI/bge-reranker-v2-m3 (~568M).
 retrieval:
   mode: hybrid
   hybrid_impl: client_side

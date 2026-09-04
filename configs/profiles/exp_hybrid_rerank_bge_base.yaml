@@ -1,4 +1,4 @@
-# L1 MAY row. Same index_sig as gpu_default nomic ingest. Fetch 20, rerank to 10.
+# L1 MAY row. Same index_sig as gpu_default nomic ingest. BAAI/bge-reranker-base (~278M).
 retrieval:
   mode: hybrid
   hybrid_impl: client_side
@@ -10,7 +10,7 @@ retrieval:
   reranker:
     name: cross_encoder
     params:
-      model_id: mixedbread-ai/mxbai-rerank-xsmall-v1
+      model_id: BAAI/bge-reranker-base
       top_n: 10
       device: auto
       batch_size: 16
