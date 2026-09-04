@@ -77,6 +77,9 @@ class BaseVectorStore(ABC):
     def delete_by_doc(self, doc_id: str, *, except_hash: str | None = None) -> int: ...
 
     @abstractmethod
+    def count_by_doc_hash(self, doc_id: str, content_hash: str) -> int: ...
+
+    @abstractmethod
     def search_dense(
         self, q: Sequence[float], k: int, filters: dict[str, Any] | None = None
     ) -> list[RetrievedChunk]: ...

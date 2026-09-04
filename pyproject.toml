@@ -12,6 +12,8 @@ dependencies = [
     "structlog>=24.4",
     "pymupdf>=1.25",
     "rapidfuzz>=3.11",
+    "qdrant-client>=1.12",
+    "openai>=1.60",
 ]
 
 [project.scripts]
@@ -98,8 +100,29 @@ testpaths = ["tests"]
 python_version = "3.12"
 strict = true
 mypy_path = "src"
-packages = ["docintel.config", "docintel.core", "docintel.data", "docintel.evaluation"]
+packages = [
+    "docintel.config",
+    "docintel.core",
+    "docintel.data",
+    "docintel.evaluation",
+    "docintel.ingestion",
+]
 
 [[tool.mypy.overrides]]
-module = ["torch", "torch.*", "fitz", "pymupdf", "rapidfuzz", "rapidfuzz.*"]
+module = [
+    "torch",
+    "torch.*",
+    "fitz",
+    "pymupdf",
+    "rapidfuzz",
+    "rapidfuzz.*",
+    "qdrant_client",
+    "qdrant_client.*",
+    "openai",
+    "openai.*",
+    "fastembed",
+    "fastembed.*",
+    "sentence_transformers",
+    "sentence_transformers.*",
+]
 ignore_missing_imports = true

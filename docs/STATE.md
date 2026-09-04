@@ -5,7 +5,7 @@ working session. One line per task; keep history in the changelog at the bottom.
 
 Status legend: `[ ]` pending  `[~]` in progress  `[x]` done  `[-]` dropped / deferred
 
-Last updated: 2026-09-04 (WS1 reviewed and committed on Mac; C1 PUBLISH pending)
+Last updated: 2026-09-04 (WS2 implemented on Mac; C2 pending Windows doctor + ingest)
 
 ---
 
@@ -14,8 +14,8 @@ Last updated: 2026-09-04 (WS1 reviewed and committed on Mac; C1 PUBLISH pending)
 | Workstream | Status | Notes |
 |------------|--------|-------|
 | WS0 Bootstrap + config | [x] | Mac tests/ruff/mypy green. Windows `2.11.0+cu128 True NVIDIA GeForce RTX 5060 Laptop GPU`. C0 = `2acf9af` |
-| WS1 Data manifest + eval set | [~] | 510 walked, 400/50 manifest, 25 types, group-balanced qa_dev 40 / qa_test 30, 33 tests green. Open: C1 PUBLISH |
-| WS2 Ingestion | [ ] | |
+| WS1 Data manifest + eval set | [x] | 510 walked, 400/50 manifest, 25 types, group-balanced qa_dev 40 / qa_test 30. C1 = `a5b134b` |
+| WS2 Ingestion | [~] | Mac: loaders, recursive+fixed_token, hash/st/openai/bm25, Qdrant prepare-then-swap, doctor. Reviewed; 47 tests, mypy strict. Open: Windows doctor + default-profile ingest, C2 |
 | WS3 Retrieval + L1 eval | [ ] | |
 | WS4 LLM + agentic graph | [ ] | |
 | WS5 Generation eval (RAGAS + DeepEval) + MLflow + ablations | [ ] | |
@@ -24,14 +24,14 @@ Last updated: 2026-09-04 (WS1 reviewed and committed on Mac; C1 PUBLISH pending)
 | WS8 FastAPI + Qdrant server + load test | [-] | MAY / write-up next step. Docker not required |
 | WS9 Write-up + video | [ ] | |
 
-Current focus: WS1
+Current focus: WS2
 
 Publish gates (tick only after personal-machine push + Mac `git fetch`):
 
 | Gate | After | On GitHub | Date |
 |------|-------|-----------|------|
 | C0 | WS0 | [x] | 2026-09-04 `2acf9af` |
-| C1 | WS1 | [ ] | |
+| C1 | WS1 | [x] | 2026-09-04 `a5b134b` |
 | C2 | WS2 | [ ] | |
 | C3 | WS3 | [ ] | |
 | C4 | WS4 | [ ] | |
@@ -113,20 +113,21 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 - [x] `evaluation/gold.py` SpanMatcher (`<omitted>`, hyphenation, doc_id); unit tests
 - [x] `docs/DATA.md`, `evals/README.md`
 - [x] acceptance: 70 QA across 5 buckets; >= 1 question per eval doc; disjointness + matcher tests green
-- [ ] **C1 PUBLISH**: bundle -> personal push -> Mac fetch. Block WS3 L1 until ticked.
+- [x] **C1 PUBLISH**: `origin/main` = `a5b134b` (noreply). WS2 unblocked.
 
 ## WS2: Ingestion
 
-- [ ] pymupdf loader with page/bbox, header/footer stripping, agreement_type from path
-- [ ] txt loader + extraction validation ratio report
-- [ ] chunkers MUST: recursive. SHOULD: one of fixed_token / section_aware. MAY: the rest
-- [ ] embedders MUST: st_dense (nomic default; bge-small for dev_cpu), openai_embedder (text-embedding-3-small via OPENAI_API_KEY), fastembed_bm25. MAY: bge_m3
-- [ ] qdrant indexer: collection named by `index_sig`, fingerprint check, named vectors, payload indexes, uuid5(doc, hash, idx, sig) ids, `delete_by_doc(except_hash)`
-- [ ] document registry with `status` + prepare-then-swap order + `--only-changed` / `--resume`
-- [ ] `IngestionPipeline` + `ingestion_report.json` (docs, chars, tokens, chunks, bytes, timings, failures)
-- [ ] CLI `docintel ingest`, `docintel doctor` (preflight)
-- [ ] tests: chunker invariants; embedded-qdrant integration; fault tests (dim mismatch, mid-embed failure keeps old points, second opener)
-- [ ] acceptance: `doctor` green on Windows; default-profile ingest (nomic or openai + BM25); incremental re-run skips unchanged; interrupted ingest leaves old version queryable
+- [x] pymupdf loader with page/bbox, header/footer stripping, agreement_type from path
+- [x] txt loader + extraction validation ratio report
+- [x] chunkers MUST: recursive. SHOULD: fixed_token (`exp_chunk_fixed`). MAY skipped
+- [x] embedders MUST: `st_dense` / `nomic_v15` (sentence-transformers, no `trust_remote_code`), `openai` (`embeddings.create` + `dimensions`, openai 2.54), `fastembed_bm25` (`Qdrant/bm25` + `Modifier.IDF`). `hash` / `hash_sparse` for tests. MAY bge_m3 skipped
+- [x] qdrant indexer (client 1.19): `cuad__{index_sig[:12]}`, fingerprint point, named `dense`+`sparse`, payload indexes, uuid5 ids, `count_by_doc_hash`, `delete_by_doc(except_hash)`, `query_points`
+- [x] document registry (sqlite3) with `status` + prepare-then-swap + `--only-changed` (default) / `--full`; failed rows auto-retried
+- [x] `IngestionPipeline` + `.cache/ingestion_report.json`
+- [x] CLI `docintel ingest --path/--only-changed|--full/--report`, `docintel doctor`
+- [x] tests: chunker invariants; header strip reaches blocks; 3-PDF embedded Qdrant; dim mismatch; mid-embed keeps old points then retries; second opener `QdrantInUseError`; manifest jobs. 47 passed; `mypy --strict` covers `docintel.ingestion`
+- [x] review pass: header strip now at block level (was dead on the PDF path); ratio gate uses pre-strip text; spans joined without spaces; page-number regex capped at 3 digits; `--only-changed` gate fixed and failed rows retried; nomic `trust_remote_code` fallback. Verified on 40 real CUAD PDFs: 0 ratio failures, ~48k header chars stripped, all chunks have bboxes
+- [ ] acceptance: `doctor` green on Windows (`uv sync --group gpu`); default-profile ingest (nomic or openai + BM25); incremental skip already proven in tests
 - [ ] **C2 PUBLISH**: bundle -> personal push -> Mac fetch. No raw ingest reports.
 
 ## WS3: Retrieval + L1 eval
@@ -251,3 +252,6 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 | 2026-09-04 | WS1 review: 510 PDFs walked by suffix (311 `.PDF`); byte-identical duplicate dropped; eval docs must be sole member of their stem family; hyphen join limited to line breaks; dead helpers removed; `txt_name` added to manifest. 30 tests green. |
 | 2026-09-04 | WS1: 400 top-up/trim now from largest types; 30/20 split is seeded and group-balanced (14/10/6 and 10/6/4). 32 tests green. |
 | 2026-09-04 | WS1 fix: CSV clause cells are Python reprs; `gold_spans` were stored as `"['...']"` strings. Parse with `ast.literal_eval`; eval JSONs regenerated. Plan 3.1/3.3/3.4/WS1 rewritten to match the build. 33 tests green. WS1 COMMIT on Mac. |
+| 2026-09-04 | C1 closed. Personal push landed. Mac `git fetch` + ff: `origin/main` = `a5b134b` (noreply). WS2 unblocked. |
+| 2026-09-04 | WS2 on Mac: pymupdf+txt loaders, recursive+fixed_token, st/nomic/openai/fastembed BM25 (IDF), Qdrant 1.19 named vectors + prepare-then-swap registry, doctor. 44 tests. C2 blocked on Windows doctor + full ingest. |
+| 2026-09-04 | WS2 review: fixed dead header strip (blocks), ratio on pre-strip text, span join, page-number regex, `--only-changed` no-op + silent failed skips (`--resume` dropped), doctor hash false-fail, nomic remote-code fallback. 47 tests; mypy strict on ingestion. |

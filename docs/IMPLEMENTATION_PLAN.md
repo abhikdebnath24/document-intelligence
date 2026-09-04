@@ -327,9 +327,9 @@ Design rules:
 - `index_sig` = sha256 of the ingestion subtree of the resolved config: loader, chunker params, dense model id + revision + dimension + normalize + prefixes, sparse model, `pipeline_version`. Collection name = `cuad__{index_sig[:12]}`. Aliases are for display only; two configs that differ in any embedding-relevant field never share a collection (OpenAI small 1536d and large 3072d would otherwise collide under one `openai` alias).
 - `ensure_collection` reads the stored fingerprint payload from the collection and refuses to ingest if vector names, dimensions, or distance differ.
 - Point ids are deterministic (uuid5 over `doc_id, content_hash, chunk_idx, index_sig`) so re-ingest is idempotent and old/new versions of a doc never overwrite each other.
-- Registry rows carry `status: pending | indexed | failed`; `--resume` re-processes non-indexed rows. Any failed doc that is in the eval split makes the CLI exit non-zero.
+- Registry rows carry `status: pending | indexed | failed`. `--only-changed` (default) skips only rows that are `indexed` with the same sha256 + `index_sig`; pending / failed / changed rows are always retried, so no separate `--resume` flag. `--full` re-embeds everything (idempotent ids). Any failed doc makes the CLI exit non-zero; eval-split failures are listed separately.
 - Registry lives in the same SQL DB as feedback (`documents` table).
-- CLI: `docintel ingest --profile <name> [--only-changed] [--resume] [--paths ...]`.
+- CLI: `docintel ingest --profile <name> [--only-changed | --full] [--path ...] [--report ...]`.
 - Embedded Qdrant is single-process: one cached client per process; a second opener (CLI while Streamlit runs) gets a clear error. Never copy `.qdrant/` between machines; re-ingest instead.
 - Streamlit SHOULD expose "Upload PDF" that calls `IngestService.ingest_paths()` to demo freshness live. Upload handling: ignore the client filename, write to `data/uploads/<uuid>.pdf`, check PDF magic bytes, size cap (25 MB), page cap (300), and parser success before ingest.
 
@@ -1167,7 +1167,7 @@ Tasks:
 3. Chunkers: MUST `recursive` (512/64). SHOULD one other (`fixed_token` or `section_aware`). MAY `sentence_window`, `parent_child`, `semantic`. Shared helper maps char spans to `(page_no, bboxes)`; prepend optional `section_header` when `contextual_header: true`.
 4. Embedders (MUST): `st_dense` (nomic-v1.5 default; bge-small for `dev_cpu`), `openai_embedder` (`text-embedding-3-small` / `-large`; same `OPENAI_API_KEY` as the LLM factory; switch by `dense_embedder.name: openai` in the profile). Sparse: `fastembed_sparse` BM25. MAY later: `bge_m3` dense+sparse.
 5. `indexers/qdrant_indexer.py`: `ensure_collection(index_sig)` with named vectors `dense` and `sparse`, fingerprint payload point, refuse on dimension/name mismatch; payload indexes on `doc_id`, `agreement_type`, `page_no`; batched upsert with uuid5 ids; `count_by_doc_hash`; `delete_by_doc(except_hash)`.
-6. `registry_store.py`: documents table with `status`; prepare-then-swap order and `--only-changed` / `--resume` logic (section 4.3); non-zero exit when an eval-split doc fails.
+6. `registry_store.py`: documents table with `status`; prepare-then-swap order and `--only-changed` / `--full` logic (section 4.3); failed rows retried on the next run; non-zero exit when any doc fails.
 7. `pipeline.py`: `IngestionPipeline.run(paths | manifest)` with progress, timing, and `ingestion_report.json` (docs, chunks, failures, validation flags).
 8. CLI: `docintel ingest --profile gpu_default --only-changed`.
 9. Tests: chunker invariants (coverage of full text, monotonic spans, bbox not empty), integration with 3 PDFs into embedded Qdrant, plus fault tests: wrong vector dimension rejected by `ensure_collection`; embedding failure mid-doc leaves old points intact and registry `failed`; second Qdrant opener gets a clear error.
@@ -1406,7 +1406,7 @@ Rows expected to be inconclusive or negative (write them up honestly): fusion va
 | 8 GB VRAM shared by embedder + reranker + (optional) NLI verifier | OOM during eval | load models lazily per stage; fp16; batch sizes in config; `nli_cross_encoder` optional; never load two embedders at once |
 | 400-doc corpus x many ablations = long GPU time | ablation ladder incomplete | L1 rows reuse collections where only retrieval params change (fusion, reranker need no re-embed); chunker/embedder rows are the only re-ingests; run them overnight |
 | Tuning on the reported eval set | rubric "no test leakage" fails | document-disjoint `qa_dev` / `qa_test`; `--split test` gated by `finalists.txt`; RAGAS declared headline before running |
-| Embedding failure mid-ingest deletes a doc's old chunks | doc silently missing from retrieval | prepare-then-swap order in 4.3; `status` in registry; `--resume`; fault test |
+| Embedding failure mid-ingest deletes a doc's old chunks | doc silently missing from retrieval | prepare-then-swap order in 4.3; `status` in registry; failed rows auto-retried; fault test |
 | Same collection reused across incompatible embedders | dimension mismatch or wrong vectors | collection named by `index_sig`; `ensure_collection` refuses mismatches |
 | Two processes open embedded Qdrant | lock error / corruption | single-process rule; clear error on second opener; server mode is the multi-process answer |
 | Mac-authored commands break on Windows | full runs blocked | `uv run ...` is canonical; `Makefile` is convenience only; `pathlib` relative to repo root; test long CUAD filenames |

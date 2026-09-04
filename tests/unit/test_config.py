@@ -16,6 +16,15 @@ from docintel.core.errors import ConfigError
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def test_openai_and_fixed_chunk_profiles_load() -> None:
+    openai = load_config("openai_embed", repo_root=ROOT)
+    assert openai.ingestion.dense_embedder.name == "openai"
+    assert openai.ingestion.dense_embedder.params["model_id"] == "text-embedding-3-small"
+    fixed = load_config("exp_chunk_fixed", repo_root=ROOT)
+    assert fixed.ingestion.chunker.name == "fixed_token"
+    assert index_sig(fixed) != index_sig(load_config("base", repo_root=ROOT))
+
+
 def test_load_base_and_dev_cpu_profile() -> None:
     base = load_config("base", repo_root=ROOT)
     assert base.ingestion.dense_embedder.name == "nomic_v15"

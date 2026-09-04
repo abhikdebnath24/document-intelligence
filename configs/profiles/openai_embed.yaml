@@ -1,0 +1,9 @@
+# First-class OpenAI dense path. Requires OPENAI_API_KEY in .env.
+ingestion:
+  dense_embedder:
+    name: openai
+    params:
+      model_id: text-embedding-3-small
+      dimensions: 1536
+      normalize: true
+      batch_size: 64

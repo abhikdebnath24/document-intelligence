@@ -893,10 +893,12 @@ name = "docintel"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "openai" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pymupdf" },
     { name = "pyyaml" },
+    { name = "qdrant-client" },
     { name = "rapidfuzz" },
     { name = "structlog" },
     { name = "typer" },
@@ -949,10 +951,12 @@ phoenix = [
 
 [package.metadata]
 requires-dist = [
+    { name = "openai", specifier = ">=1.60" },
     { name = "pydantic", specifier = ">=2.10" },
     { name = "pydantic-settings", specifier = ">=2.7" },
     { name = "pymupdf", specifier = ">=1.25" },
     { name = "pyyaml", specifier = ">=6.0" },
+    { name = "qdrant-client", specifier = ">=1.12" },
     { name = "rapidfuzz", specifier = ">=3.11" },
     { name = "structlog", specifier = ">=24.4" },
     { name = "typer", specifier = ">=0.15" },

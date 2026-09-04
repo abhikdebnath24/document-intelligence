@@ -10,7 +10,7 @@ lint:
 	uv run ruff format --check src tests
 
 test:
-	uv run pytest tests/unit
+	uv run pytest tests
 
 ingest:
 	uv run docintel ingest --profile $(or $(PROFILE),dev_cpu)

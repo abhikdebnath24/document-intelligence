@@ -1,0 +1,8 @@
+# SHOULD chunker ablation. Same embedder as the active default profile.
+ingestion:
+  chunker:
+    name: fixed_token
+    params:
+      chunk_tokens: 512
+      overlap_tokens: 64
+      contextual_header: false

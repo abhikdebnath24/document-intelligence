@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import typer
 
 from docintel import __version__
 from docintel.config import config_hash, index_sig, load_config
+from docintel.config.loader import find_repo_root
 from docintel.core.logging import configure_logging, get_logger
 from docintel.settings import load_settings
 
@@ -40,12 +43,37 @@ def config_hash_cmd(profile: str = _PROFILE_OPT) -> None:
 @app.command()
 def ingest(
     profile: str = _PROFILE_OPT,
-    only_changed: bool = typer.Option(False, "--only-changed"),
-    resume: bool = typer.Option(False, "--resume"),
+    only_changed: bool = typer.Option(
+        True,
+        "--only-changed/--full",
+        help="Skip docs already indexed with the same sha256 + index_sig (default). "
+        "--full re-embeds everything.",
+    ),
+    path: list[Path] | None = typer.Option(
+        None, "--path", help="PDF paths; default is the manifest"
+    ),
+    report: Path | None = typer.Option(None, "--report"),
 ) -> None:
-    load_config(profile)
-    _ = (only_changed, resume)
-    _not_implemented("ingest", "WS2")
+    cfg = load_config(profile)
+    from docintel.ingestion.factory import build_ingest_components
+
+    root = find_repo_root()
+    pipeline = build_ingest_components(cfg, repo_root=root)
+    out = report or (root / ".cache" / "ingestion_report.json")
+    result = pipeline.run(
+        paths=list(path) if path else None,
+        only_changed=only_changed,
+        report_path=out,
+    )
+    typer.echo(
+        f"collection={result.collection} indexed={result.indexed} "
+        f"skipped={result.skipped} failed={len(result.failed)} chunks={result.chunks}"
+    )
+    if result.eval_failures:
+        typer.echo(f"eval-split failures: {', '.join(result.eval_failures)}", err=True)
+    typer.echo(f"report={out}")
+    if result.failed:
+        raise typer.Exit(code=1)
 
 
 @app.command()
@@ -77,5 +105,10 @@ def serve(profile: str = _PROFILE_OPT) -> None:
 @app.command()
 def doctor(profile: str = _PROFILE_OPT) -> None:
     cfg = load_config(profile)
-    typer.echo(f"profile={cfg.profile} config_hash={config_hash(cfg)[:12]}")
-    _not_implemented("doctor preflight", "WS2")
+    from docintel.ingestion.doctor import run_doctor
+
+    lines, failed = run_doctor(cfg)
+    for line in lines:
+        typer.echo(line)
+    if failed:
+        raise typer.Exit(code=1)
