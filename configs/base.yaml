@@ -1,0 +1,139 @@
+corpus:
+  manifest: data_manifest/corpus_manifest.json
+  pdf_root: data/CUAD_v1/full_contract_pdf
+  txt_root: data/CUAD_v1/full_contract_txt
+  limit_docs: null
+
+ingestion:
+  loader:
+    name: pymupdf
+    params:
+      strip_headers_footers: true
+  chunker:
+    name: recursive
+    params:
+      chunk_tokens: 512
+      overlap_tokens: 64
+  dense_embedder:
+    name: nomic_v15
+    params:
+      model_id: nomic-ai/nomic-embed-text-v1.5
+      revision: null
+      device: auto
+      batch_size: 32
+      normalize: true
+      doc_prefix: "search_document: "
+      query_prefix: "search_query: "
+  sparse_encoder:
+    name: fastembed_bm25
+    params: {}
+  vectorstore:
+    name: qdrant
+    params:
+      mode: embedded
+      path: .qdrant
+      on_disk: true
+  collection_prefix: cuad
+  pipeline_version: v1
+
+retrieval:
+  mode: hybrid
+  hybrid_impl: client_side
+  k_candidates: 20
+  fusion:
+    name: rrf
+    params:
+      k: 60
+  reranker:
+    name: none
+    params: {}
+  query_transforms: []
+  filters:
+    use_agreement_type: true
+    use_doc_hint: true
+
+agent:
+  max_rewrites: 2
+  min_relevant_chunks: 2
+  grader:
+    name: llm_batch
+    params: {}
+  verifier:
+    name: llm_claims
+    params:
+      threshold: 0.8
+  citation_quote_fuzzy_threshold: 90
+  general_knowledge_disclaimer: true
+  abstain_show_nearest: true
+  abstain_message_style: explicit
+
+llm:
+  default_provider: anthropic
+  roles:
+    router:
+      model: anthropic:claude-haiku-4-5
+      temperature: 0
+    grader:
+      model: anthropic:claude-haiku-4-5
+      temperature: 0
+    generation:
+      model: anthropic:claude-sonnet-4-6
+      temperature: 0
+    verifier:
+      model: anthropic:claude-haiku-4-5
+      temperature: 0
+    judge:
+      model: anthropic:claude-sonnet-4-6
+      temperature: 0
+  timeout_s: 60
+  max_retries: 3
+  query_deadline_s: 90
+
+evaluation:
+  qa_dev: evals/qa_dev.json
+  qa_test: evals/qa_test.json
+  split: dev
+  finalists_file: evals/finalists.txt
+  ks: [1, 3, 5, 10]
+  span_match_threshold: 90
+  frameworks: [ragas]
+  judge_role: judge
+  ragas:
+    metrics:
+      - faithfulness
+      - answer_relevancy
+      - context_precision_with_reference
+      - context_recall
+      - noise_sensitivity
+    batch_size: 8
+  deepeval:
+    metrics:
+      - faithfulness
+      - answer_relevancy
+      - contextual_precision
+      - contextual_recall
+      - contextual_relevancy
+    threshold: 0.7
+    geval_rubrics: []
+  results_root: results
+
+tracking:
+  mlflow:
+    enabled: true
+    tracking_uri: file:./mlruns
+    experiment: docintel
+    log_traces: true
+
+feedback:
+  db_url: sqlite:///./docintel.db
+
+tracing:
+  sinks: [jsonl, mlflow]
+  jsonl_dir: traces/
+  phoenix:
+    endpoint: http://127.0.0.1:6006
+
+frontend:
+  backend: inprocess
+  api_url: http://127.0.0.1:8000
+  pdf_render_dpi: 120

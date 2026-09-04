@@ -1,0 +1,18 @@
+# Default full-run profile. Embedder is explicit; never inferred from API keys.
+ingestion:
+  dense_embedder:
+    name: nomic_v15
+    params:
+      model_id: nomic-ai/nomic-embed-text-v1.5
+      revision: null
+      device: auto
+      batch_size: 32
+      normalize: true
+      doc_prefix: "search_document: "
+      query_prefix: "search_query: "
+
+retrieval:
+  mode: hybrid
+  reranker:
+    name: none
+    params: {}

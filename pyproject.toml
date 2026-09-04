@@ -1,0 +1,103 @@
+[project]
+name = "docintel"
+version = "0.1.0"
+description = "Agentic hybrid RAG over commercial contracts (CUAD)"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "pydantic>=2.10",
+    "pydantic-settings>=2.7",
+    "pyyaml>=6.0",
+    "typer>=0.15",
+    "structlog>=24.4",
+]
+
+[project.scripts]
+docintel = "docintel.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/docintel"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.9",
+    "mypy>=1.14",
+    "pre-commit>=4.0",
+    "types-pyyaml>=6.0",
+]
+gpu = [
+    "torch>=2.7",
+    "sentence-transformers>=3.3",
+    "fastembed>=0.4",
+    "qdrant-client>=1.12",
+    "pymupdf>=1.25",
+    "rapidfuzz>=3.11",
+    "bm25s>=0.2",
+]
+eval = [
+    "ragas>=0.2",
+    "deepeval>=2.0",
+    "mlflow>=2.19",
+]
+frontend = [
+    "streamlit>=1.41",
+    "streamlit-pdf-viewer>=0.0.21",
+]
+api = [
+    "fastapi>=0.115",
+    "uvicorn>=0.34",
+]
+phoenix = [
+    "arize-phoenix>=8.0",
+    "openinference-instrumentation-langchain>=0.1",
+]
+llm = [
+    "langchain>=0.3",
+    "langchain-anthropic>=0.3",
+    "langchain-openai>=0.3",
+    "langchain-google-genai>=2.0",
+    "langgraph>=0.2",
+    "sqlalchemy>=2.0",
+]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu128", marker = "sys_platform == 'win32'" },
+    { index = "pytorch-cpu", marker = "sys_platform == 'darwin'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "src"
+packages = ["docintel.config", "docintel.core"]
+
+[[tool.mypy.overrides]]
+module = ["torch", "torch.*"]
+ignore_missing_imports = true

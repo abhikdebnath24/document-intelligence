@@ -1,0 +1,17 @@
+# Mac smoke profile: 20 docs, tiny embedder, no reranker.
+corpus:
+  limit_docs: 20
+
+ingestion:
+  dense_embedder:
+    name: st_dense
+    params:
+      model_id: BAAI/bge-small-en-v1.5
+      revision: null
+      device: auto
+      batch_size: 8
+      normalize: true
+      max_seq_len: 512
+
+retrieval:
+  k_candidates: 10

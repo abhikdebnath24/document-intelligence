@@ -219,3 +219,14 @@ __marimo__/
 
 # Local datasets (CUAD and derived indexes)
 data/
+
+# Local runtime artifacts (docintel)
+.qdrant/
+mlruns/
+traces/
+docintel.db
+*.db-journal
+results/*/per_question.jsonl
+results/*/traces/
+.cache/
+*.bundle
