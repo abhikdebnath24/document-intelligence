@@ -5,7 +5,7 @@ working session. One line per task; keep history in the changelog at the bottom.
 
 Status legend: `[ ]` pending  `[~]` in progress  `[x]` done  `[-]` dropped / deferred
 
-Last updated: 2026-09-04 (WS0 Mac acceptance green; Windows CUDA check + C0 PUBLISH pending)
+Last updated: 2026-09-04 (WS1 reviewed and committed on Mac; C1 PUBLISH pending)
 
 ---
 
@@ -13,8 +13,8 @@ Last updated: 2026-09-04 (WS0 Mac acceptance green; Windows CUDA check + C0 PUBL
 
 | Workstream | Status | Notes |
 |------------|--------|-------|
-| WS0 Bootstrap + config | [~] | Mac verified: 13 tests, ruff, mypy --strict green. Open: Windows cu128 check, first COMMIT, C0 PUBLISH |
-| WS1 Data manifest + eval set | [ ] | CUAD downloaded locally; PDF/TXT parity verified |
+| WS0 Bootstrap + config | [x] | Mac tests/ruff/mypy green. Windows `2.11.0+cu128 True NVIDIA GeForce RTX 5060 Laptop GPU`. C0 = `2acf9af` |
+| WS1 Data manifest + eval set | [~] | 510 walked, 400/50 manifest, 25 types, group-balanced qa_dev 40 / qa_test 30, 33 tests green. Open: C1 PUBLISH |
 | WS2 Ingestion | [ ] | |
 | WS3 Retrieval + L1 eval | [ ] | |
 | WS4 LLM + agentic graph | [ ] | |
@@ -24,13 +24,13 @@ Last updated: 2026-09-04 (WS0 Mac acceptance green; Windows CUDA check + C0 PUBL
 | WS8 FastAPI + Qdrant server + load test | [-] | MAY / write-up next step. Docker not required |
 | WS9 Write-up + video | [ ] | |
 
-Current focus: WS0
+Current focus: WS1
 
 Publish gates (tick only after personal-machine push + Mac `git fetch`):
 
 | Gate | After | On GitHub | Date |
 |------|-------|-----------|------|
-| C0 | WS0 | [ ] | |
+| C0 | WS0 | [x] | 2026-09-04 `2acf9af` |
 | C1 | WS1 | [ ] | |
 | C2 | WS2 | [ ] | |
 | C3 | WS3 | [ ] | |
@@ -82,7 +82,7 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 - Plan 11.0 has the gate table. Tick the Snapshot publish-gate row when GitHub has the commits.
 - Data: `data/CUAD_v1/` (gitignored, 168 MB unzipped)
 - Hardware: macOS for writing code + `dev_cpu` smoke runs; Windows (Core Ultra 7, RTX 5060 8 GB) for ingest, ablations, evals, demo
-- Windows GPU check: `uv run python -c "import torch;print(torch.__version__, torch.cuda.is_available())"` must show `+cu128` and `True`
+- Windows GPU check: passed 2026-09-04. `2.11.0+cu128 True NVIDIA GeForce RTX 5060 Laptop GPU`
 - MLflow UI: `uv run mlflow ui --backend-store-uri file:./mlruns` (mlruns/ gitignored)
 
 ---
@@ -90,7 +90,7 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 ## WS0: Bootstrap + config system
 
 - [x] uv project, `pyproject.toml`, dependency groups, `uv.lock`, `.python-version`
-- [ ] torch pinned per platform via `[tool.uv.sources]` (cu128 on win32, cpu on darwin); verified on Windows
+- [x] torch pinned per platform via `[tool.uv.sources]` (cu128 on win32, cpu on darwin); verified on Windows (`2.11.0+cu128`)
 - [x] `configs/base.yaml`, `configs/profiles/dev_cpu.yaml`, `gpu_default.yaml`
 - [x] `config/schema.py` (strict `extra=forbid` on every node), `config/loader.py`, `config_hash()`, `index_sig()` (ignores `device`/`batch_size`)
 - [x] `core/registry.py`, `core/interfaces.py`, `core/types.py`, `core/device.py`, `core/logging.py`
@@ -98,20 +98,21 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 - [x] `Makefile`, `.env.example`, `.pre-commit-config.yaml`
 - [x] unit tests: config merge/env override/hash/index_sig/typo rejection; registry; device (13 passed)
 - [x] verification pass 2026-09-04: `uv run pytest tests/unit`, `ruff check`, `ruff format --check`, `mypy --strict` (config + core) all green on Mac
-- [~] acceptance: Mac green. Windows `uv sync --group gpu` + `+cu128` CUDA print still open
-- [ ] first COMMIT (WS0 files are untracked; author confirmed noreply)
-- [ ] **C0 PUBLISH**: bundle -> personal push -> Mac fetch. Block WS1 until ticked.
+- [x] acceptance: Mac green. Windows `uv sync --group gpu` + `2.11.0+cu128 True NVIDIA GeForce RTX 5060 Laptop GPU`
+- [x] first COMMIT `2acf9af` (noreply author + committer)
+- [x] **C0 PUBLISH**: bundle -> personal push -> Mac `git fetch`. `origin/main` == `2acf9af`
 
 ## WS1: Data manifest + eval set
 
-- [ ] `scripts/select_corpus.py` -> `data_manifest/corpus_manifest.json` (400 docs, 50 eval, stratified)
-- [ ] stem normalization and join to `master_clauses.csv`; unmatched report
-- [ ] `scripts/build_eval_set.py` -> draft questions; hand-review; add general / out-of-scope items
-- [ ] document-disjoint split -> `evals/qa_dev.json` (~40, 30 docs) + `evals/qa_test.json` (~30, 20 docs); sha256 in `evals/README.md`
-- [ ] all eval-split docs pass PDF/TXT ratio gate before freeze
-- [ ] `evaluation/gold.py` span matcher (+ `<omitted>` handling, doc_id match) with unit tests
-- [ ] `docs/DATA.md`, `evals/README.md`
-- [ ] acceptance: ~70 QA items across 5 buckets (>= 1 per eval doc); disjointness test green; matcher tests green
+- [x] `scripts/select_corpus.py` -> `data_manifest/corpus_manifest.json` (400 docs, 50 eval, 25 types, seed 42)
+- [x] stem normalization + alnum key join to `master_clauses.csv`; sha256 dedupe; 4 skipped (3 no CSV row, 1 duplicate) reported in the manifest
+- [x] eval docs restricted to single-member stem families (no `_part1/_part2`, `agreement1/3` siblings as decoys with the same name)
+- [x] `scripts/build_eval_set.py` templates + 4 general/out-of-scope items (wording editable in JSON); clause cells parsed with `ast.literal_eval`
+- [x] document-disjoint, group-balanced `evals/qa_dev.json` (40 / 30 docs: 14 core, 10 IP, 6 other) + `evals/qa_test.json` (30 / 20 docs: 10 / 6 / 4); sha256 in `evals/README.md`
+- [x] all 50 eval docs passed PDF/TXT ratio gate (no replacements)
+- [x] `evaluation/gold.py` SpanMatcher (`<omitted>`, hyphenation, doc_id); unit tests
+- [x] `docs/DATA.md`, `evals/README.md`
+- [x] acceptance: 70 QA across 5 buckets; >= 1 question per eval doc; disjointness + matcher tests green
 - [ ] **C1 PUBLISH**: bundle -> personal push -> Mac fetch. Block WS3 L1 until ticked.
 
 ## WS2: Ingestion
@@ -245,3 +246,8 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 | 2026-09-04 | C0-C9 COMMIT/PUBLISH gates added. COMMIT after each task on Mac; PUBLISH = bundle + personal push + Mac fetch. |
 | 2026-09-04 | WS0 implemented on Mac: uv project, config loader + hash/index_sig, registry, ABCs, CLI stubs, 11 unit tests. Windows cu128 verify and C0 PUBLISH still open. |
 | 2026-09-04 | WS0 verification: fixed 4 mypy strict errors, `typer.Exit(str)` misuse, `index_sig` now excludes runtime knobs, `NamedStrategy` extra=forbid, CLI profile default from `DOCINTEL_PROFILE`. 13 tests green. |
+| 2026-09-04 | C0 closed. Windows CUDA `2.11.0+cu128 True RTX 5060 Laptop GPU`. `origin/main` = `2acf9af` (noreply). WS1 unblocked. |
+| 2026-09-04 | WS1: 400/50 stratified manifest (25 types, 3 unmatched), ratio gate green on all 50 eval docs, qa_dev 40 / qa_test 30 document-disjoint, SpanMatcher tests. C1 not published. |
+| 2026-09-04 | WS1 review: 510 PDFs walked by suffix (311 `.PDF`); byte-identical duplicate dropped; eval docs must be sole member of their stem family; hyphen join limited to line breaks; dead helpers removed; `txt_name` added to manifest. 30 tests green. |
+| 2026-09-04 | WS1: 400 top-up/trim now from largest types; 30/20 split is seeded and group-balanced (14/10/6 and 10/6/4). 32 tests green. |
+| 2026-09-04 | WS1 fix: CSV clause cells are Python reprs; `gold_spans` were stored as `"['...']"` strings. Parse with `ast.literal_eval`; eval JSONs regenerated. Plan 3.1/3.3/3.4/WS1 rewritten to match the build. 33 tests green. WS1 COMMIT on Mac. |

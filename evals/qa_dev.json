@@ -1,0 +1,660 @@
+[
+  {
+    "id": "q_001",
+    "doc_stem": "",
+    "agreement_type": "",
+    "category": "general",
+    "bucket": "general",
+    "question": "What does a governing-law clause usually decide?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "general",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_002",
+    "doc_stem": "",
+    "agreement_type": "",
+    "category": "general",
+    "bucket": "general",
+    "question": "What is a force majeure clause in a commercial contract?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "general",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_003",
+    "doc_stem": "abilityinc_06_15_2020-ex-4.25-services agreement",
+    "agreement_type": "Service",
+    "category": "IP Assignment",
+    "bucket": "yes_span",
+    "question": "Does the Abilityinc Services Agreement include an IP Assignment clause?",
+    "gold_spans": [
+      "To the extent that any writings or works of authorship may not, by operation of law, be works made for hire, this Agreement shall constitute an irrevocable assignment by Provider to the Recipient of the ownership of and all rights of copyright in, such items, and the Recipient shall have the right to obtain and hold in its own name, rights of copyright, copyright registrations, and similar protections which may be available in the works.",
+      "All writings or works of authorship, including, without limitation, program codes or documentation, produced or authored by Provider in the course of performing services for the Recipient, together with any associated copyrights, are works made for hire and the exclusive property of the Recipient.",
+      "Recipient shall own, and Provider hereby irrevocably assigns to the Recipient, all rights, title, and interest in any invention, technique, process, device, discovery, improvement, or know-how, whether patentable or not and all other proprietary rights, industrial rights and any other similar rights, in each case on a worldwide basis, and all copies and tangible embodiments thereof, or any part thereof, in whatever form or medium hereafter made or conceived solely or jointly by Provider while working for or on behalf of the Recipient, which relate to, is suggested by, or results from the Services."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_004",
+    "doc_stem": "arcaustreasuryfund_20200207_n-2_ex-99.k5_11971930_ex-99.k5_development agreement",
+    "agreement_type": "Development",
+    "category": "Governing Law",
+    "bucket": "slot",
+    "question": "Which jurisdiction's law governs the Arcaustreasuryfund BLOCKCHAIN ADMINISTRATION AND DEVELOPMENT AGREEMENT?",
+    "gold_spans": [
+      "This Agreement shall be construed in accordance with the laws of the State of New York applicable to contracts formed and to be performed entirely within the State of New York, without regard to conflict of laws principles, and in accordance with the applicable provisions of the Investment Fund Act."
+    ],
+    "gold_answer": "New York",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_005",
+    "doc_stem": "ceres,inc_01_25_2012-ex-10.20-collaboration agreement",
+    "agreement_type": "Collaboration",
+    "category": "Non-Compete",
+    "bucket": "no_answer",
+    "question": "Does the Ceres,Inc COLLABORATION AGREEMENT include a Non-Compete clause?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": true,
+    "split": "dev"
+  },
+  {
+    "id": "q_006",
+    "doc_stem": "cheetahmobileinc_04_22_2014-ex-10.43-cooperation agreement",
+    "agreement_type": "Collaboration",
+    "category": "Exclusivity",
+    "bucket": "yes_span",
+    "question": "Does the Cheetahmobileinc Cooperation Agreement include an Exclusivity clause?",
+    "gold_spans": [
+      "All act which may damage the right of user of Baidu promotion, damage user experience, disturb market cooperation order of the Union, adversely affect Baidu product and business reputation of Baidu, constitute unfair competition against Baidu or violate legal right of Baidu are forbidden by the Union, including but not limited to:<omitted>5. Breach of exclusivity clause\n\nBreach the exclusivity agreement with Baidu to engage in competing business."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_007",
+    "doc_stem": "electrameccanica vehicles corp. - manufacturing agreement",
+    "agreement_type": "Manufacturing",
+    "category": "Cap On Liability",
+    "bucket": "no_answer",
+    "question": "Does the Electrameccanica Vehicles Corp.  Manufacturing Agreement include a Cap On Liability clause?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": true,
+    "split": "dev"
+  },
+  {
+    "id": "q_008",
+    "doc_stem": "euromediaholdingscorp_20070215_10sb12g_ex-10.b(01)_525118_ex-10.b(01)_content license agreement",
+    "agreement_type": "License",
+    "category": "Audit Rights",
+    "bucket": "yes_span",
+    "question": "Does the Euromediaholdingscorp VIDEO-ON-DEMAND CONTENT LICENSE AGREEMENT include an Audit Rights clause?",
+    "gold_spans": [
+      "During the Term, and for a period of twelve (12) months thereafter, Rogers (and its representatives) shall have the right, upon reasonable prior written notice to Licensor, and during regular business hours, to inspect and/or audit Licensor's books and records to confirm compliance with Licensor's obligations under this Section."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_009",
+    "doc_stem": "kitovpharmaltd_20190326_20-f_ex-4.15_11584449_ex-4.15_manufacturing agreement",
+    "agreement_type": "Manufacturing",
+    "category": "Exclusivity",
+    "bucket": "yes_span",
+    "question": "Does the Kitovpharmaltd PRODUCT MANUFACTURING AGREEMENT include an Exclusivity clause?",
+    "gold_spans": [
+      "Kitov hereby grants to Dexcel a fully paid, limited license right to use all of its Confidential Information and Intellectual Property Rights (including, inter alia, the Kitov Foreground IP, Kitov Data, Kitov's share of the Joint IP, and the Trademark (\"Kitov Product IP\")) necessary in order for Dexcel to manufacture, Label, package with the Livery, test and release the Product for shipment, exclusively for Kitov, for and during the Term."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_010",
+    "doc_stem": "mediwoundltd_01_15_2014-ex-10.6-supply agreement",
+    "agreement_type": "Supply",
+    "category": "Non-Compete",
+    "bucket": "no_answer",
+    "question": "Does the Mediwoundltd Supply Agreement include a Non-Compete clause?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": true,
+    "split": "dev"
+  },
+  {
+    "id": "q_011",
+    "doc_stem": "meetgroup,inc_06_29_2017-ex-10.1-cooperation agreement",
+    "agreement_type": "Collaboration",
+    "category": "Governing Law",
+    "bucket": "slot",
+    "question": "Which jurisdiction's law governs the Meetgroup,Inc COOPERATION AGREEMENT?",
+    "gold_spans": [
+      "This Agreement shall be governed in all respects, including validity, interpretation, and effect, by, and construed in accordance with, the laws of the State of Delaware executed and to be performed wholly within the State of Delaware, without giving effect to the choice of law or conflict of law principles thereof or of any other jurisdiction to the extent that such principles would require or permit the application of the laws of another jurisdiction."
+    ],
+    "gold_answer": "Delaware",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_012",
+    "doc_stem": "nelnetinc_04_08_2020-ex-1-joint filing agreement",
+    "agreement_type": "Joint Venture",
+    "category": "Exclusivity",
+    "bucket": "no_answer",
+    "question": "Does the Nelnetinc JOINT FILING AGREEMENT include an Exclusivity clause?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": true,
+    "split": "dev"
+  },
+  {
+    "id": "q_013",
+    "doc_stem": "neonsystemsinc_03_01_1999-ex-10.5-distributor agreement_amendment",
+    "agreement_type": "Distributor",
+    "category": "Exclusivity",
+    "bucket": "yes_span",
+    "question": "Does the Neonsystemsinc FIRST AMENDMENT TO                                                                           DISTRIBUTOR AGREEMENT include an Exclusivity clause?",
+    "gold_spans": [
+      "Licensor and Licensee do hereby agree that this Amendment shall effect a change in the nature of the distributorship granted to Licensee pursuant to the Distributor Agreement from a non-exclusive to an exclusive distributorship (provided, however, that with respect to Licensor's Partitioned Database Facility product, Licensor also may license such product to International Business Machines Corporation for sublicensing and distribution).",
+      "Any and all references in the Distributor Agreement to the rights granted to Licensee as non-exclusive rights are hereby amended to provide that such rights are<omitted>exclusive rights (including without limitation such references in Sections 2.1"
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_014",
+    "doc_stem": "niceltd_06_26_2003-ex-4.5-outsourcing agreement",
+    "agreement_type": "Outsourcing",
+    "category": "Governing Law",
+    "bucket": "slot",
+    "question": "Which jurisdiction's law governs the Niceltd MANUFACTURING OUTSOURCING AGREEMENT?",
+    "gold_spans": [
+      "This Agreement shall be governed by and           construed in accordance with the laws of the state of Israel, without           giving effect to choice of law rules."
+    ],
+    "gold_answer": "Israel",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_015",
+    "doc_stem": "on2technologies,inc_11_17_2006-ex-10.3-support and maintenance agreement",
+    "agreement_type": "Maintenance",
+    "category": "Governing Law",
+    "bucket": "slot",
+    "question": "Which jurisdiction's law governs the On2Technologies,Inc SUPPORT AND MAINTENANCE AGREEMENT?",
+    "gold_spans": [
+      "This Agreement shall be governed by and construed in accordance with the laws of the State of New York, without giving effect to any choice of law or conflict of law provision or rule whether such provision or rule is that of the State of New York or any other jurisdiction."
+    ],
+    "gold_answer": "New York",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_016",
+    "doc_stem": "orbsatcorp_08_17_2007-ex-7.3-strategic alliance agreement",
+    "agreement_type": "Strategic Alliance",
+    "category": "Non-Compete",
+    "bucket": "yes_span",
+    "question": "Does the Orbsatcorp Strategic Alliance Agreement include a Non-Compete clause?",
+    "gold_spans": [
+      "Should AVDU decide not to proceed in the acquisition of the technology/company as described above, then AVDU shall be prohibited from acquiring the technology/company either directly or indirectly, from the technology/company developer for a period of 24 months following the termination of this Strategic Alliance Agreement.",
+      "AVDU will not seek to acquire any technologies presented to AVDU by UTK directly from the technology developer for a period of 24 months following the termination of this Strategic Alliance agreement."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_017",
+    "doc_stem": "pharmageninc_20120803_8-ka_ex-10.1_7693204_ex-10.1_endorsement agreement",
+    "agreement_type": "Endorsement",
+    "category": "Governing Law",
+    "bucket": "slot",
+    "question": "Which jurisdiction's law governs the Pharmageninc ENDORSEMENT AGREEMENT?",
+    "gold_spans": [
+      "Regardless of the place of execution hereof, this Agreement, all amendments hereto, and any and all  issues or controversies arising here from or related hereto, shall be governed by and construed exclusively in  accordance with the laws and decisions of the State of Georgia."
+    ],
+    "gold_answer": "Georgia",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_018",
+    "doc_stem": "premierbiomedicalinc_05_14_2020-ex-10.2-intellectual property agreement",
+    "agreement_type": "IP",
+    "category": "Audit Rights",
+    "bucket": "no_answer",
+    "question": "Does the Premierbiomedicalinc Intellectual Property Agreement include an Audit Rights clause?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": true,
+    "split": "dev"
+  },
+  {
+    "id": "q_019",
+    "doc_stem": "premierbiomedicalinc_05_14_2020-ex-10.2-intellectual property agreement",
+    "agreement_type": "IP",
+    "category": "Cap On Liability",
+    "bucket": "no_answer",
+    "question": "Does the Premierbiomedicalinc Intellectual Property Agreement include a Cap On Liability clause?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": true,
+    "split": "dev"
+  },
+  {
+    "id": "q_020",
+    "doc_stem": "premierbiomedicalinc_05_14_2020-ex-10.2-intellectual property agreement",
+    "agreement_type": "IP",
+    "category": "Governing Law",
+    "bucket": "slot",
+    "question": "Which jurisdiction's law governs the Premierbiomedicalinc Intellectual Property Agreement?",
+    "gold_spans": [
+      "This Agreement and the rights of the Parties hereunder shall be governed by and construed in accordance with the laws of the Commonwealth of Pennsylvania including all matters of construction, validity, performance, and enforcement and without giving effect to the principles of conflict of laws."
+    ],
+    "gold_answer": "Pennsylvania",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_021",
+    "doc_stem": "premierbiomedicalinc_05_14_2020-ex-10.2-intellectual property agreement",
+    "agreement_type": "IP",
+    "category": "Parties",
+    "bucket": "slot",
+    "question": "Who are the parties to the Premierbiomedicalinc Intellectual Property Agreement?",
+    "gold_spans": [
+      "Premier",
+      "Each shall be referred to as a \"Party\" and collectively as the \"Parties.\"",
+      "Premier Biomedical, Inc.",
+      "Marv Enterprises, LLC",
+      "THI",
+      "Marv",
+      "Technology Health, Inc."
+    ],
+    "gold_answer": "Marv Enterprises, LLC (\"Marv\"); Premier Biomedical, Inc. (\"Premier\"); Technology Health, Inc. (\"THI\"); (Each shall be referred to as a \u201cParty\u201d and collectively as the \u201cParties.\u201d)",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_022",
+    "doc_stem": "premierbiomedicalinc_05_14_2020-ex-10.2-intellectual property agreement",
+    "agreement_type": "IP",
+    "category": "Exclusivity",
+    "bucket": "yes_span",
+    "question": "Does the Premierbiomedicalinc Intellectual Property Agreement include an Exclusivity clause?",
+    "gold_spans": [
+      "If THI does not make the obligatory payments as stated in 2(b) by the dates stated, the Exclusive License will revert back to Premier.",
+      "The licenses granted herein are exclusive worldwide licenses to:   1.         make, have made, use, lease, sell and import Licensed Products for the legal purposes of researching, developing, manufacturing, assembling, distributing, and selling the Licensed Products;   2.         make, have made, use and import machines, tools, materials and other instrumentalities, insofar as such machines, tools, materials and other instrumentalities are involved in or incidental to the research, development, manufacture, testing or repair of Licensed Products which are or have been made, used, leased, owned, sold or imported by the Licensee; and   3.         convey to any customer of the Licensee, with respect to any Licensed Product which is sold or leased to such customer, rights to use and resell such Licensed Product as sold or leased by Licensee (whether or not as part of a larger combination); provided, however, that no rights may be conveyed to customers with respect to any Invention which is directed to (i) a combination of such Licensed Product (as sold or leased) with any other product, (ii) a method or process which is other than the inherent use of such Licensed Product itself (as sold or leased), or (iii) a method or process involving the use of a Licensed Product to manufacture (including associated testing) any other product.",
+      "If THI does not make the obligatory payments as stated in 3(a) by the dates stated, the Exclusive License will revert back to Premier, provided, however, that in such event, THI would still be entitled to a proportionate interest in any Covid-19 Licensed Products, such portion being equal to a fraction, the numerator of which shall be the actual amount paid and the denominator of which shall be $2,000,000."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_023",
+    "doc_stem": "premierbiomedicalinc_05_14_2020-ex-10.2-intellectual property agreement",
+    "agreement_type": "IP",
+    "category": "License Grant",
+    "bucket": "yes_span",
+    "question": "Does the Premierbiomedicalinc Intellectual Property Agreement include a License Grant clause?",
+    "gold_spans": [
+      "THI is granted the following rights to the Applications in Appendix A and the Licensed Products derived therefrom:",
+      "Licenses granted herein are solely for products in the form sold by the Licensee and are not to be construed either (i) as consent by the Marv to any act which may be performed by the Licensee, except to the extent impacted by a patent licensed herein to the Licensee, or (ii) to include licenses to contributorily infringe or induce infringement under U.S. law or a foreign equivalent thereof.",
+      "The licenses granted herein are exclusive worldwide licenses to:   1.         make, have made, use, lease, sell and import Licensed Products for the legal purposes of researching, developing, manufacturing, assembling, distributing, and selling the Licensed Products;   2.         make, have made, use and import machines, tools, materials and other instrumentalities, insofar as such machines, tools, materials and other instrumentalities are involved in or incidental to the research, development, manufacture, testing or repair of Licensed Products which are or have been made, used, leased, owned, sold or imported by the Licensee; and   3.         convey to any customer of the Licensee, with respect to any Licensed Product which is sold or leased to such customer, rights to use and resell such Licensed Product as sold or leased by Licensee (whether or not as part of a larger combination); provided, however, that no rights may be conveyed to customers with respect to any Invention which is directed to (i) a combination of such Licensed Product (as sold or leased) with any other product, (ii) a method or process which is other than the inherent use of such Licensed Product itself (as sold or leased), or (iii) a method or process involving the use of a Licensed Product to manufacture (including associated testing) any other product.",
+      "The grant of each license hereunder includes the right to grant sublicenses to Related Companies for so long as it remains a Related Companies. Any such sublicense may be made effective retroactively, but not prior to the effective date hereof, nor prior to the sublicensee's becoming a Related Company."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_024",
+    "doc_stem": "scansourceinc_20190822_10-k_ex-10.38_11793958_ex-10.38_distributor agreement2",
+    "agreement_type": "Distributor",
+    "category": "Audit Rights",
+    "bucket": "yes_span",
+    "question": "Does the Scansourceinc Software License Agreement [v.08.05.03] include an Audit Rights clause?",
+    "gold_spans": [
+      "Customer grants to Cisco and its independent accountants the right to examine Customer's books, records and accounts during Customer's normal business hours to verify compliance with this Agreement.",
+      "In the event such audit discloses non-compliance with this Agreement, Customer shall promptly pay to Cisco the appropriate license fees."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_025",
+    "doc_stem": "scansourceinc_20190822_10-k_ex-10.39_11793959_ex-10.39_distributor agreement",
+    "agreement_type": "Distributor",
+    "category": "Exclusivity",
+    "bucket": "no_answer",
+    "question": "Does the Scansourceinc AMENDMENT NO. 3 TO THE NONEXCLUSIVE VALUE ADDED DISTRIBUTOR AGREEMENT include an Exclusivity clause?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": true,
+    "split": "dev"
+  },
+  {
+    "id": "q_026",
+    "doc_stem": "seaspineholdingscorp_10_10_2018-ex-10.1-supply agreement",
+    "agreement_type": "Supply",
+    "category": "Exclusivity",
+    "bucket": "yes_span",
+    "question": "Does the Seaspineholdingscorp SUPPLY AGREEMENT include an Exclusivity clause?",
+    "gold_spans": [
+      "Subject to the terms and conditions of this Agreement, PcoMed hereby grants to Integra and its Affiliates a sole and exclusive worldwide right to sell and commercialize Integra Products treated by PcoMed, with the PcoMed Surface Modification Technology (the \"Right\") for use in the Field in the Territory, including the right to conduct research and development in support of any of the foregoing."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_027",
+    "doc_stem": "sibannac,inc_12_04_2017-ex-2.1-strategic alliance agreement",
+    "agreement_type": "Strategic Alliance",
+    "category": "Governing Law",
+    "bucket": "slot",
+    "question": "Which jurisdiction's law governs the Sibannac,Inc Strategic Alliance Agreement?",
+    "gold_spans": [
+      "This Agreement is entered into in the State of Texas and shall be interpreted according to the laws of the State of Texas."
+    ],
+    "gold_answer": "Texas",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_028",
+    "doc_stem": "simplicityesportsgamingcompany_20181130_8-k_ex-10.1_11444071_ex-10.1_franchise agreement",
+    "agreement_type": "Franchise",
+    "category": "Exclusivity",
+    "bucket": "yes_span",
+    "question": "Does the Simplicityesportsgamingcompany MASTER FRANCHISE AGREEMENT include an Exclusivity clause?",
+    "gold_spans": [
+      "Except as provided in the next sentence, the license granted herein shall be exclusive.",
+      "\"Exclusivity\" shall mean that Franchisor shall not grant any further licenses to third parties in the Trademarks for use in connection with Smaaash Centres in the Territory, and the Franchisee shall not enter into any arrangement or agreement with any third parties for establishing or operating any gaming and entertainment centres identical or similar to Smaaash Centres, in the Territory except as otherwise provided in this Agreement; provided, however, that Franchisor may continue to use the Trademarks in the Territory in connection with the operation of Franchisor's entertainment centers already set up as of the Effective Date in the Territory. The restriction contained in this Agreement shall apply on the parties throughout the Term.",
+      "Subject to Section 1.2, Franchisor hereby grants to Franchisee the exclusive right, (a) to establish and operate Smaaash Centres in the Territory, (b) to sub-license the right to establish and operate Smaaash Centres to third party franchisees in and for the Territory, (c) a license to use the products and other services developed by Franchisor with respect to the Smaaash Centres (including a right to authorise the use of products and services developed by the Franchisor by third party franchisees), in the Territory, and (d) to identify third party franchisees for the Smaaash Centres in the Territory."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_029",
+    "doc_stem": "spienergyco,ltd_03_09_2011-ex-99.5-operations and maintenance agreement",
+    "agreement_type": "Maintenance",
+    "category": "Insurance",
+    "bucket": "yes_span",
+    "question": "Does the Spienergyco,Ltd OPERATIONS AND MAINTENANCE AGREEMENT include an Insurance clause?",
+    "gold_spans": [
+      "Service Provider shall provide and maintain excess liability insurance covering employer's liability, commercial  general liability, and business automobile liability, in the amount of Five Million Dollars ($5,000,000) combined single limit policy limit per  occurrence and in the aggregate for bodily injury and property damage.",
+      "All policies of insurance referred to in this Section 4.1 shall be endorsed: (i) to specify that they are primary to and not  excess to or on a contributing basis with any insurance or self-insurance maintained by Owner, Owner and User (and their respective Affiliates) or  any SubService Providers in respect of losses arising out of or in connection with the Services; (ii) to include Owner, Owner, User and, upon  User's request and if applicable, User's landlord, or a subsequent owner, tenant or subtenant of the Premises as additional insureds; and (iii)  contain a standard severability of interests clause.",
+      "Service Provider shall provide and maintain worker's compensation insurance as required by applicable law where the  Services are performed and employer's liability insurance with a limit of liability of One Million Dollars ($1,000,000) for each accident and in the  aggregate.",
+      "Within thirty (30) days after the Effective Date, Service Provider shall provide a certificate of insurance and  thereafter shall maintain the following insurance during the Term with insurance carriers reasonably acceptable to Owner:\n\n(a) Commercial General Liability. Service Provider shall provide and maintain commercial general liability insurance with combined single policy  limits not less than Two Million Dollars ($2,000,000) for bodily injury or property damage for each occurrence and in the aggregate, including broad  form contractual liability insurance, broad form property damage, personal injury, products and completed operations insurance.\n\n(b) Automobile Liability. Service Provider shall provide and maintain business auto liability insurance covering owned, non-owned and hired  automobiles in the amount of One Million Dollars ($1,000,000) combined<omitted>single policy limit for bodily injury and property damage for each accident."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_030",
+    "doc_stem": "spienergyco,ltd_07_10_2014-ex-10-cooperation agreement of 50mwp photovoltaic grid-connected power generation project in yangqiao of~1",
+    "agreement_type": "Collaboration",
+    "category": "Parties",
+    "bucket": "slot",
+    "question": "Who are the parties to the Spienergyco,Ltd Cooperation Agreement?",
+    "gold_spans": [
+      "Party A",
+      "Xinyu Xinwei New Energy Co., Ltd.",
+      "People's Government of Fenyi County",
+      "Party B"
+    ],
+    "gold_answer": "People\u2019s Government of Fenyi County (\"Party A\"); Xinyu Xinwei New Energy Co., Ltd. (\"Party B\")",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_031",
+    "doc_stem": "stampscominc_06_24_1999-ex-10.18-sponsorship agreement",
+    "agreement_type": "Sponsorship",
+    "category": "Governing Law",
+    "bucket": "slot",
+    "question": "Which jurisdiction's law governs the Stampscominc Sponsorship Agreement?",
+    "gold_spans": [
+      "This Agreement and the performance of<omitted>the parties under this Agreement shall be governed by and construed in      accordance with the laws of the State of California, U.S.A., except that      body of law concerning conflicts of laws."
+    ],
+    "gold_answer": "California",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_032",
+    "doc_stem": "stampscominc_06_24_1999-ex-10.18-sponsorship agreement",
+    "agreement_type": "Sponsorship",
+    "category": "Audit Rights",
+    "bucket": "yes_span",
+    "question": "Does the Stampscominc Sponsorship Agreement include an Audit Rights clause?",
+    "gold_spans": [
+      "Intuit may,      upon no less than thirty (30) days prior written notice to Client, cause an      independent Certified Public Accountant to inspect all relevant records of      Client upon which the calculation of such payments are based during      Client's normal business hours.",
+      "The audit      rights set forth herein shall continue for one (1) year following the      termination of this Agreement for any reason.",
+      "No such audit may occur more      than once a year during the Term.",
+      "Client      may, upon no less than thirty (30) days prior written notice to Intuit,      cause an independent Certified Public Accountant to inspect all relevant      records of Intuit upon which the calculation of Impressions under the Usage      Reports are based during Client's normal business hours."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_033",
+    "doc_stem": "stampscominc_06_24_1999-ex-10.18-sponsorship agreement",
+    "agreement_type": "Sponsorship",
+    "category": "Cap On Liability",
+    "bucket": "yes_span",
+    "question": "Does the Stampscominc Sponsorship Agreement include a Cap On Liability clause?",
+    "gold_spans": [
+      "THE LIABILITY OF EITHER PARTY FOR DAMAGES OR ALLEGED DAMAGES      HEREUNDER (EXCEPT UNDER SECTIONS 15 AND 16), WHETHER IN CONTRACT, TORT OR      ANY OTHER LEGAL THEORY, IS LIMITED TO, AND WILL NOT EXCEED, THE AMOUNTS TO      BE PAID BY CLIENT TO INTUIT HEREUNDER.",
+      "EXCEPT UNDER SECTIONS 15 AND 16, IN NO EVENT WILL EITHER PARTY BE LIABLE TO      THE OTHER FOR ANY SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES, WHETHER<omitted>BASED ON BREACH OF CONTRACT, TORT (INCLUDING NEGLIGENCE) OR OTHERWISE,      WHETHER OR NOT THAT PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH      DAMAGE."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_034",
+    "doc_stem": "stampscominc_06_24_1999-ex-10.18-sponsorship agreement",
+    "agreement_type": "Sponsorship",
+    "category": "Non-Compete",
+    "bucket": "yes_span",
+    "question": "Does the Stampscominc Sponsorship Agreement include a Non-Compete clause?",
+    "gold_spans": [
+      "Throughout the Term Intuit will not place, and will not allow any party      acting on its behalf to place, any graphic, link or other form of      advertising or media on any page of the Quicken.com Site and/or on any page      on the AOL.com Personal Finance Site (other than the Channel Home Page),      which markets or promotes any electronic postage product, postage meter\n\n\n\n\n\n     and/or service (\"Postage Products\") offered by a Client Competitor.",
+      "If Intuit elects to provide advertising, sponsorship or other      -------      promotional space on all or any portion of the Intuit Sites for a Client      Competitor, Intuit agrees to negotiate with Client in good faith regarding      such promotional opportunity."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_035",
+    "doc_stem": "stampscominc_20001114_10-q_ex-10.47_2631630_ex-10.47_co-branding agreement",
+    "agreement_type": "Co-Branding",
+    "category": "Exclusivity",
+    "bucket": "yes_span",
+    "question": "Does the Stampscominc MANIFEST SYSTEM SERVICES AND CO-BRANDING AGREEMENT include an Exclusivity clause?",
+    "gold_spans": [
+      "The Company shall not enter into any agreement or arrangement,      including without limitation any sale, license, service agreement,      co-branding agreement, co-marketing agreement or linking agreement with any      provider of manifesting or shipping services through non-carrier retail      shipping locations; provided, however, that:\n\n               (A) the Company may provide listings of carrier drop-boxes or      carrier-owned counter drop-off locations specific to a particular carrier      (including, without limitation, locations within retail establishments) on      the Company Site, provided that such listings do not include retail      shipping locations, including UPS authorized shipping outlets, FedEx      authorized shipping centers and other commercial mail receiving agencies;      and\n\n               (B) the Company may enter into any such agreement or arrangement      so long as MBE is given advance written notice of such agreement or      arrangement and such agreement or arrangement prohibits the use of the      Manifest or any Company Technology to manifest or ship packages for retail      customers and provided further that Company terminates service to any such      entity that uses the Manifest or any Company Technology to serve retail      customers.",
+      "MBE shall not enter into any agreement or arrangement with any      provider of an online or Internet-based manifest system other than the      Company."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_036",
+    "doc_stem": "teleglobeinternationalholdingsltd_03_29_2004-ex-10.10-construction and maintenance agreement",
+    "agreement_type": "Maintenance",
+    "category": "Parties",
+    "bucket": "slot",
+    "question": "Who are the parties to the Teleglobeinternationalholdingsltd ASIA PACIFIC CABLE NETWORK 2 CONSTRUCTION & MAINTENANCE AGREEMENT?",
+    "gold_spans": [
+      "China United Telecommunications Corporation",
+      "China Telecom",
+      "Taiwan Fixed Network Co., Ltd. Preparatory Office",
+      "Telia AB (publ)",
+      "Maxis International Sdn. Bhd",
+      "Advantage Telecommunications Ltd.",
+      "APT Satellite Telecommunications Limited",
+      "Williams Communications, Inc.,",
+      "NTT Communications Corporation",
+      "Japan Telecom Co., Ltd.",
+      "KPN Telecom B.V.",
+      "PT Indosat (Persero) Tbk",
+      "Teleglobe USA Inc.",
+      "CTI International Limited",
+      "Telstra Global Networks Limited",
+      "Bayan Telecommunications, Inc.",
+      "Layer 2 Communications Group Ltd.",
+      "StarHub Pte Ltd",
+      "Concert Global Network Services, Ltd.",
+      "GNG Networks. Inc.",
+      "TT dotCom Sdn Bhd",
+      "Metromedia Fiber Network Services, Inc.",
+      "The Communications Authority of Thailand",
+      "Chunghwa Telecom Co., Ltd.,",
+      "GTE Intelligent Network Service Incorporated",
+      "Global One Communications Network, Inc.",
+      "Philippine Long Distance Telephone Company",
+      "Cable & Wireless HKT international Limited",
+      "KDD Corporation",
+      "Onse Telecom Corporation",
+      "edge2net Inc.",
+      "New World Telephone Limited",
+      "Dacom Corporation",
+      "Singapore Telecommunications Limited",
+      "Korea Telecom",
+      "China Netcom Corporation Ltd.",
+      "Cable & Wireless Global Network Limited",
+      "MCI International Telecommunications. Inc.",
+      "Onelink Cable Network Limited",
+      "Globe Telecom, Inc.",
+      "NTT Com Asia Ltd.",
+      "Eastern Telecommunications Philippines, Incorporated",
+      "New Century InfoComm Ltd., Preparatory Office",
+      "Global Access Ltd.",
+      "Telekom Malaysia Berhad (128740-P)",
+      "(hereinafter collectively called \"Parties\" and individually called \"Party\"),"
+    ],
+    "gold_answer": "Advantage Telecommunications Ltd.; Cable & Wireless Global Network Limited; Cable & Wireless HKT international Limited; China Telecom; China United Telecommunications Corporation; Chunghwa Telecom Co., Ltd.,; Concert Global Network Services, Ltd.; Global One Communications Network, Inc.; Japan Telecom Co., Ltd.; KDD Corporation; Korea Telecom; KPN Telecom B.V.; Layer 2 Communications Group Ltd.; MCI International Telecommunications. Inc.; Metromedia Fiber Network Services, Inc.; New Century InfoComm Ltd., Preparatory Office; NTT Communications Corporation; Onelink Cable Network Limited; Philippine Long Distance Telephone Company; Singapore Telecommunications Limited; StarHub Pte Ltd; Taiwan Fixed Network Co., Ltd. Preparatory Office; Teleglobe USA Inc.; Telekom Malaysia Berhad (128740-P); Telstra Global Networks Limited; Williams Communications, Inc.,; APT Satellite Telecommunications Limited; Bayan Telecommunications, Inc.; China Netcom Corporation Ltd.; The Communications Authority of Thailand; CTI International Limited; Dacom Corporation; edge2net Inc.; Eastern Telecommunications Philippines, Incorporated; Global Access Ltd.; Globe Telecom, Inc.; GNG Networks. Inc.; GTE Intelligent Network Service Incorporated; PT Indosat (Persero) Tbk; Maxis International Sdn. Bhd; New World Telephone Limited; NTT Com Asia Ltd.;Onse Telecom Corporation; Telia AB (publ); TT dotCom Sdn Bhd; (hereinafter collectively called \u201cParties\u201d and individually called \u201cParty\u201d)",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_037",
+    "doc_stem": "telkomsaltd_01_30_2003-ex-10-licence and maintenance agreement",
+    "agreement_type": "Maintenance",
+    "category": "Governing Law",
+    "bucket": "slot",
+    "question": "Which jurisdiction's law governs the Telkomsaltd LICENCE AND MAINTENANCE AGREEMENT?",
+    "gold_spans": [
+      "This AGREEMENT shall be governed by and construed under the   Laws of the Republic of South Africa."
+    ],
+    "gold_answer": "Republic of South Africa",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_038",
+    "doc_stem": "vivint solar, inc. - non-competition agreement",
+    "agreement_type": "Non-Compete",
+    "category": "Exclusivity",
+    "bucket": "no_answer",
+    "question": "Does the Vivint Solar, Inc.  NON-COMPETITION AGREEMENT AMENDMENT NO. 1 include an Exclusivity clause?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": true,
+    "split": "dev"
+  },
+  {
+    "id": "q_039",
+    "doc_stem": "westpharmaceuticalservicesinc_20200116_8-k_ex-10.1_11947529_ex-10.1_supply agreement",
+    "agreement_type": "Supply",
+    "category": "Governing Law",
+    "bucket": "slot",
+    "question": "Which jurisdiction's law governs the Westpharmaceuticalservicesinc GLOBAL MASTER SUPPLY AGREEMENT?",
+    "gold_spans": [
+      "This Agreement shall be governed and construed in accordance with the law set forth in the ExxonMobil Selling Affiliate's general terms and conditions, as applicable.",
+      "The parties' rights and obligations hereunder shall be construed and enforced under the laws of the State of Texas, U.S.A., without regard to conflict of laws principles. Incoterms 2010 (or any subsequent revision thereof) (\"Incoterms\") shall also apply; provided, however, that Incoterms shall apply only to the extent specified in the agreement hereof, and provided, further, that in the event of a conflict between Incoterms and the laws of the State of Texas, U.S.A., the latter shall govern.",
+      "This Agreement shall be governed by Singapore law, without regard to its conflict of laws principles.",
+      "This Agreement between EM and Buyer shall be governed by the laws of Belgium (excluding its rules on conflict of laws)."
+    ],
+    "gold_answer": "Texas; Singapore; Belgium",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  },
+  {
+    "id": "q_040",
+    "doc_stem": "xlitechnologies,inc_12_11_2015-ex-10.1-sponsorship agreement",
+    "agreement_type": "Sponsorship",
+    "category": "Insurance",
+    "bucket": "yes_span",
+    "question": "Does the Xlitechnologies,Inc Sponsorship Agreement include an Insurance clause?",
+    "gold_spans": [
+      "6.1 Both parties shall at all times while this Agreement is in effect and for one (1) year thereafter, at its expense, carry and maintain, at its own expense, insurance on all its operations necessary to comply with insurance laws as applicable."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "dev"
+  }
+]

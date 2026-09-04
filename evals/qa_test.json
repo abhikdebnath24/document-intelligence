@@ -1,0 +1,464 @@
+[
+  {
+    "id": "q_041",
+    "doc_stem": "",
+    "agreement_type": "",
+    "category": "out_of_scope",
+    "bucket": "general",
+    "question": "What is the weather in Pune today?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "out_of_scope",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_042",
+    "doc_stem": "",
+    "agreement_type": "",
+    "category": "out_of_scope",
+    "bucket": "general",
+    "question": "Who won the 2019 Cricket World Cup?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "out_of_scope",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_043",
+    "doc_stem": "accurayinc_09_01_2010-ex-10.31-distributor agreement",
+    "agreement_type": "Distributor",
+    "category": "Effective Date + Expiration Date",
+    "bucket": "cross_ref",
+    "question": "What is the expiration date of the Accurayinc Multiple LINAC and Multi-Modality Distributor Agreement, and from which effective date is that term measured?",
+    "gold_spans": [
+      "June 8, 2010",
+      "Unless otherwise agreed in writing by Accuray and Distributor and subject to the termination rights contained in this Agreement,  this Agreement shall begin on the Effective Date and shall continue until the termination of the Strategic Alliance Agreement;  provided, however, that if a Termination Election relating to this Agreement is made pursuant to Section 10.3 of the Strategic  Alliance Agreement prior to such termination, this Agreement shall terminate 36 months after such Termination Election (the  \"Term\")."
+    ],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_044",
+    "doc_stem": "blackboxstocksinc_08_05_2014-ex-10.1-distributor agreement",
+    "agreement_type": "Distributor",
+    "category": "Effective Date + Expiration Date",
+    "bucket": "cross_ref",
+    "question": "What is the expiration date of the Blackboxstocksinc DISTRIBUTOR AGREEMENT, and from which effective date is that term measured?",
+    "gold_spans": [
+      "1st day of August, 2013",
+      "The term of this Agreement shall terminate on May 31, 2015, unless sooner terminated."
+    ],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_045",
+    "doc_stem": "blackrockmuniholdingsinvestmentqualityfund_04_07_2020-ex-99.01-joint filing agreement",
+    "agreement_type": "Joint Venture",
+    "category": "Parties",
+    "bucket": "slot",
+    "question": "Who are the parties to the Blackrockmuniholdingsinvestmentqualityfund JOINT FILING AGREEMENT?",
+    "gold_spans": [
+      "BANK OF AMERICA CORPORATION",
+      "BANC OF AMERICA PREFERRED FUNDING CORPORATION"
+    ],
+    "gold_answer": "Bank of America Corporatino, Banc of America Preferred Funding Corporation",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_046",
+    "doc_stem": "bontonstoresinc_04_20_2018-ex-99.3-agency agreement",
+    "agreement_type": "Agency",
+    "category": "Exclusivity",
+    "bucket": "yes_span",
+    "question": "Does the Bontonstoresinc AGENCY AGREEMENT include an Exclusivity clause?",
+    "gold_spans": [
+      "orders of, and applicable restrictions imposed by, governmental authorities (collectively, the \"Applicable General Laws\"), other than all applicable laws, rules and regulations in respect of \"going out of business\", \"store closing\" or similar-themed sales and permitting (collectively, the \"Liquidation Sale Laws\")",
+      "following the occurrence of the closing under this Agreement, which shall occur no later than April 19, 2018 (the \"Closing\"), subject to payment of the Cash Purchase Price (as defined below) and Purchaser's compliance with its other obligations hereunder, Agent shall have the exclusive right to market and sell, and/or otherwise designate the purchasers, licensees, and/or assignees of, any or all of the Assets free and clear of all liens, claims, and encumbrances thereon without further order of the Bankruptcy Court;",
+      "Upon the occurrence of the Closing, Agent shall have the exclusive right to market and sell, and/or otherwise designate the purchasers, licensees, transferees, and/or<omitted>assignees of (which may in certain circumstances be Purchaser, any of the entities comprising Purchaser, any of their respective affiliates, and/or a new entity created by any of the foregoing), any or all of the Assets free and clear of all liens, claims, and encumbrances thereon, without further order of the Bankruptcy Court (the \"Asset Designation Rights\").",
+      "Agent, as the exclusive agent for Merchant, is authorized to conduct, advertise, post signs, utilize sign-walkers, and otherwise promote the GOB Sale as a \"going out of business\", \"store closing\", \"sale on everything\", \"everything must go\", or similar themed sale, in accordance with the Sale Guidelines (as the same may be modified and approved by the Bankruptcy Court), subject to compliance with the Sale Guidelines, the Approval Order, and all applicable federal, state, and local laws, regulations and ordinances, including, without limitation, all laws and regulations relating to advertising, privacy, consumer protection, occupational health and safety and the environment, together with all applicable statutes, rules, regulations and",
+      "Agent shall have the exclusive right to use the Stores and all other Assets for the purpose of conducting the GOB Sale, free of any interference from any entity or person, subject to compliance with the Sale Guidelines (as defined below) and Approval Order;"
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_047",
+    "doc_stem": "chinarealestateinformationcorp_20090929_f-1_ex-10.32_4771615_ex-10.32_content license agreement",
+    "agreement_type": "License",
+    "category": "Audit Rights",
+    "bucket": "no_answer",
+    "question": "Does the Chinarealestateinformationcorp DOMAIN NAME AND CONTENT LICENSE AGREEMENT include an Audit Rights clause?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": true,
+    "split": "test"
+  },
+  {
+    "id": "q_048",
+    "doc_stem": "energyxxiltd_05_08_2015-ex-10.13-transportation agreement",
+    "agreement_type": "Transportation",
+    "category": "Governing Law",
+    "bucket": "slot",
+    "question": "Which jurisdiction's law governs the Energyxxiltd Transportation Agreement?",
+    "gold_spans": [
+      "The validity, construction and performance of this Agreement shall be governed by the laws of the State of Texas, not including any of its conflicts of law rules that would direct or refer to the laws of another jurisdiction."
+    ],
+    "gold_answer": "Texas",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_049",
+    "doc_stem": "gigglesn_hugs,inc_06_23_2016-ex-10.2-strategic alliance agreement",
+    "agreement_type": "Strategic Alliance",
+    "category": "IP Assignment",
+    "bucket": "yes_span",
+    "question": "Does the Gigglesn Strategic Alliance Agreement include an IP Assignment clause?",
+    "gold_spans": [
+      "Consultant agrees to disclose in writing to the Company all inventions, products, designs, drawings, notes, documents, information, documentation, improvements, works of authorship, processes, techniques, know-how, algorithms, technical and business plans, specifications, hardware, circuits, computer languages, computer programs, databases, user interfaces, encoding techniques, and other materials or innovations of any kind that Consultant may make, conceive, develop or reduce to practice, alone or jointly with others, in connection with performing Services or that result from or that are related to such Services, whether or not they are eligible for patent, copyright, mask work, trade secret, trademark or other legal protection (collectively, \"Innovations\"). (ii) Ownership of Innovations",
+      "At the Company's request and expense, during and after the term of this Agreement, Consultant will assist and cooperate with the Company in all respects and will execute documents, and, subject to the reasonable availability of Consultant, give testimony and take such further acts reasonably requested by the Company to enable the Company to acquire, transfer, maintain, perfect and enforce its Intellectual Property Rights and other legal protections for the Innovations. Consultant hereby appoints the officers of the Company, as Consultant's attorney-in-fact to execute documents on behalf of Consultant for this limited purpose.",
+      "Consultant hereby irrevocably transfers and assigns to the Company, and agrees to irrevocably transfer and assign to the Company, all right, title and interest in and to the Innovations, including all worldwide patent rights (including patent applications and disclosures), copyright rights, mask work rights, trade secret rights, know-how, and any and all other intellectual property or proprietary rights (collectively, \"Intellectual Property Rights\") therein.",
+      "Consultant also hereby irrevocably transfers and assigns to the Company, and agrees to irrevocably transfer and assign to the Company, and waives and agrees never to assert, any and all Moral Rights (as defined below) that Consultant may have in or with respect to any Innovation, during and after the term of this Agreement.",
+      "Consultant agrees that, regardless of whether the Innovations are legally works made for hire, all Innovations will be the sole and exclusive property of the Company.",
+      "Consultant and the Company agree that, to the fullest extent legally possible, all Innovations will be works made for hire owned exclusively by the Company."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_050",
+    "doc_stem": "hertzglobalholdings,inc_07_07_2016-ex-10.4-intellectual property agreement",
+    "agreement_type": "IP",
+    "category": "Exclusivity",
+    "bucket": "no_answer",
+    "question": "Does the Hertzglobalholdings,Inc INTELLECTUAL PROPERTY AGREEMENT include an Exclusivity clause?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": true,
+    "split": "test"
+  },
+  {
+    "id": "q_051",
+    "doc_stem": "innerscopehearingtechnologiesinc_20181109_8-k_ex-10.6_11419704_ex-10.6_distributor agreement",
+    "agreement_type": "Distributor",
+    "category": "Insurance",
+    "bucket": "no_answer",
+    "question": "Does the Innerscopehearingtechnologiesinc EXCLUSIVE DISTRIBUTOR AGREEMENT include an Insurance clause?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": true,
+    "split": "test"
+  },
+  {
+    "id": "q_052",
+    "doc_stem": "integritymediainc_20010329_10-k405_ex-10.17_2373875_ex-10.17_co-branding agreement",
+    "agreement_type": "Co-Branding",
+    "category": "Governing Law",
+    "bucket": "slot",
+    "question": "Which jurisdiction's law governs the Integritymediainc PRODUCT DEVELOPMENT AND CO-BRANDING AGREEMENT?",
+    "gold_spans": [
+      "This Agreement has been entered into in the State of                   Tennessee, and the validity, interpretation and legal effect                   of this Agreement will be governed by the laws of the State of                   Tennessee applicable to contracts entered into and performed                   entirely within the State of Tennessee."
+    ],
+    "gold_answer": "Tennessee",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_053",
+    "doc_stem": "intriconcorp_03_10_2009-ex-10.22-strategic alliance agreement",
+    "agreement_type": "Strategic Alliance",
+    "category": "Effective Date + Expiration Date",
+    "bucket": "cross_ref",
+    "question": "What is the expiration date of the Intriconcorp Strategic Alliance Agreement, and from which effective date is that term measured?",
+    "gold_spans": [
+      "1st day of October, 2008",
+      "The initial term of this Agreement shall be five (5) years from the date of execution and may be extended subject to satisfactory  agreement on ongoing commercial terms, to be agreed two (2) months prior to the expiration of this Agreement."
+    ],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_054",
+    "doc_stem": "intriconcorp_03_10_2009-ex-10.22-strategic alliance agreement",
+    "agreement_type": "Strategic Alliance",
+    "category": "IP Assignment",
+    "bucket": "no_answer",
+    "question": "Does the Intriconcorp Strategic Alliance Agreement include an IP Assignment clause?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": true,
+    "split": "test"
+  },
+  {
+    "id": "q_055",
+    "doc_stem": "intriconcorp_03_10_2009-ex-10.22-strategic alliance agreement",
+    "agreement_type": "Strategic Alliance",
+    "category": "Non-Compete",
+    "bucket": "no_answer",
+    "question": "Does the Intriconcorp Strategic Alliance Agreement include a Non-Compete clause?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": true,
+    "split": "test"
+  },
+  {
+    "id": "q_056",
+    "doc_stem": "intriconcorp_03_10_2009-ex-10.22-strategic alliance agreement",
+    "agreement_type": "Strategic Alliance",
+    "category": "Governing Law",
+    "bucket": "slot",
+    "question": "Which jurisdiction's law governs the Intriconcorp Strategic Alliance Agreement?",
+    "gold_spans": [
+      "This Agreement is governed by the laws of Victoria, Australia and the parties submit to the jurisdiction of the courts of Victoria,  Australia"
+    ],
+    "gold_answer": "Victoria, Australia",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_057",
+    "doc_stem": "intriconcorp_03_10_2009-ex-10.22-strategic alliance agreement",
+    "agreement_type": "Strategic Alliance",
+    "category": "Parties",
+    "bucket": "slot",
+    "question": "Who are the parties to the Intriconcorp Strategic Alliance Agreement?",
+    "gold_spans": [
+      "IntriCon",
+      "IntriCon  Corporation",
+      "Dynamic Hearing Pty Ltd",
+      "Dynamic Hearing"
+    ],
+    "gold_answer": "IntriCon Corporation (\"IntriCon\"); Dynamic Hearing Pty Ltd (\"Dynamic Hearing\")",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_058",
+    "doc_stem": "intriconcorp_03_10_2009-ex-10.22-strategic alliance agreement",
+    "agreement_type": "Strategic Alliance",
+    "category": "Audit Rights",
+    "bucket": "yes_span",
+    "question": "Does the Intriconcorp Strategic Alliance Agreement include an Audit Rights clause?",
+    "gold_spans": [
+      "IntriCon must make all such records available for inspection, copying and audit by an independent auditor appointed by Dynamic  Hearing (and to which IntriCon has no reasonable objection) during ordinary business hours at any time during the Term and for a period of one  year following the expiration or earlier termination of this Agreement, provided that:<omitted>such audit must be at Dynamic Hearing's expense unless the auditor finds an underpayment royalty due under this  Agreement in excess of 5% in which case IntriCon must reimburse Dynamic Hearing's reasonable cost of such audit;"
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_059",
+    "doc_stem": "intriconcorp_03_10_2009-ex-10.22-strategic alliance agreement",
+    "agreement_type": "Strategic Alliance",
+    "category": "Exclusivity",
+    "bucket": "yes_span",
+    "question": "Does the Intriconcorp Strategic Alliance Agreement include an Exclusivity clause?",
+    "gold_spans": [
+      "Exclusivity Date means October 1, 2008, the date Intricon makes its first quarterly payment of the Minimum Payment;<omitted>Commencing on the Exclusivity Date, and continuing for so long as IntriCon continues to make such payments, the license granted to  IntriCon under this Agreement will, subject to the terms and conditions of this Agreement, be exclusive for Hearing Aids.",
+      "Commencing on October 1, 2008, and continuing for so long as IntriCon continues to make minimum payments as defined in 4.3,  Dynamic Hearing agrees that it will not license any Dynamic Hearing Technology for Hearing Aids, subject to Clause 3.5."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_060",
+    "doc_stem": "leadersonlineinc_20000427_s-1a_ex-10.8_4991089_ex-10.8_co-branding agreement",
+    "agreement_type": "Co-Branding",
+    "category": "Effective Date + Expiration Date",
+    "bucket": "cross_ref",
+    "question": "What is the expiration date of the Leadersonlineinc CO-BRANDING AGREEMENT, and from which effective date is that term measured?",
+    "gold_spans": [
+      "March 15, 2000",
+      "Term shall mean the Effective Date through June 15, 2001 and any Renewal Term (as defined in paragraph 7.4 herein.)"
+    ],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_061",
+    "doc_stem": "mplxlp_06_17_2015-ex-10.1-transportation services agreement",
+    "agreement_type": "Transportation",
+    "category": "Cap On Liability",
+    "bucket": "yes_span",
+    "question": "Does the Mplxlp TRANSPORTATION SERVICES AGREEMENT include a Cap On Liability clause?",
+    "gold_spans": [
+      "Except as otherwise provided in Section 10.5, in the event of any breach of a term or condition of this Agreement by either Party, the other Party's remedy shall be limited to the direct damages caused thereby and in no event shall a Party be liable to the other Party for any consequential, indirect, pecuniary, punitive, or economic damages, howsoever caused."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_062",
+    "doc_stem": "netgear,inc_04_21_2003-ex-10.16-distributor agreement",
+    "agreement_type": "Distributor",
+    "category": "Exclusivity",
+    "bucket": "yes_span",
+    "question": "Does the Netgear,Inc DISTRIBUTOR AGREEMENT include an Exclusivity clause?",
+    "gold_spans": [
+      "NETGEAR's agreement not to appoint additional distributors of NETGEAR Products in the Territory during the [*] of this Agreement is predicated upon Distributor performing the mutually agreed upon activities included in the Marketing Plan attached as Exhibit 4.",
+      "Distributor shall be the only distributor appointed by NETGEAR in the Territory, subject to Distributor conducting mutually agreed to marketing activities as described in the Marketing Plan to be developed and agreed to by and between the parties and which shall be attached to and made a part of this Agreement as Exhibit 4."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_063",
+    "doc_stem": "palmersquarecapitalbdcinc_20200116_10-12ga_ex-10.6_11949289_ex-10.6_trademark license agreement",
+    "agreement_type": "License",
+    "category": "Governing Law",
+    "bucket": "slot",
+    "question": "Which jurisdiction's law governs the Palmersquarecapitalbdcinc TRADEMARK LICENSE AGREEMENT?",
+    "gold_spans": [
+      "This Agreement shall be governed by, and construed in accordance with, the laws of the State of New York."
+    ],
+    "gold_answer": "New York",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_064",
+    "doc_stem": "primeenergyresourcescorp_04_02_2007-ex-10.28-completion and liquidity maintenance agreement",
+    "agreement_type": "Maintenance",
+    "category": "Governing Law",
+    "bucket": "slot",
+    "question": "Which jurisdiction's law governs the Primeenergyresourcescorp COMPLEHON AGREEMENT AND UQITDITV MAINTENANCE AGREEMENT?",
+    "gold_spans": [
+      "This Agreement shad be deemed a contract made under and shall be construed in accordance with and governed by the laws ofthe State ofTexas  and that actions arising out ofthis Agreement may be litigated in courts having situs in Harris County, Texas."
+    ],
+    "gold_answer": "Texas",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_065",
+    "doc_stem": "separateaccountiiofagl_05_02_2011-ex-99.(j)(4)-unconditional capital maintenance agreement",
+    "agreement_type": "Maintenance",
+    "category": "Exclusivity",
+    "bucket": "no_answer",
+    "question": "Does the Separateaccountiiofagl Unconditional Capital Maintenance Agreement include an Exclusivity clause?",
+    "gold_spans": [],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": true,
+    "split": "test"
+  },
+  {
+    "id": "q_066",
+    "doc_stem": "summafourinc_06_19_1998-ex-10.3-software license and maintenance agreement",
+    "agreement_type": "Maintenance",
+    "category": "Effective Date + Expiration Date",
+    "bucket": "cross_ref",
+    "question": "What is the expiration date of the Summafourinc Software license and maintenance agreement, and from which effective date is that term measured?",
+    "gold_spans": [
+      "August 4, 1997",
+      "This Agreement shall become effective on the Effective Date and shall continue in effect until terminated in accordance with the provisions of this Article 9."
+    ],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_067",
+    "doc_stem": "tubemediacorp_20060310_8-k_ex-10.1_513921_ex-10.1_affiliate agreement",
+    "agreement_type": "Affiliate",
+    "category": "Effective Date + Expiration Date",
+    "bucket": "cross_ref",
+    "question": "What is the expiration date of the Tubemediacorp CHARTER AFFILIATE AFFILIATION AGREEMENT, and from which effective date is that term measured?",
+    "gold_spans": [
+      "6t h day of March, 2006",
+      "The \"Initial Term\" shall commence upon the Effective Date and shall expire on March 31, 2011."
+    ],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_068",
+    "doc_stem": "waternowinc_20191120_10-q_ex-10.12_11900227_ex-10.12_distributor agreement",
+    "agreement_type": "Distributor",
+    "category": "Effective Date + Expiration Date",
+    "bucket": "cross_ref",
+    "question": "What is the expiration date of the Waternowinc EXCLUSIVE DISTRIBUTOR AGREEMENT, and from which effective date is that term measured?",
+    "gold_spans": [
+      "12th day of November, 2019",
+      "The initial term of this Agreement shall commence on the Effective Date and end on the five (5) year anniversary of the Effective Date (the \"Initial Term\"), unless sooner terminated pursuant to the terms hereo"
+    ],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_069",
+    "doc_stem": "waternowinc_20191120_10-q_ex-10.12_11900227_ex-10.12_distributor agreement",
+    "agreement_type": "Distributor",
+    "category": "License Grant + Non-Transferable License",
+    "bucket": "cross_ref",
+    "question": "What license grant appears in the Waternowinc EXCLUSIVE DISTRIBUTOR AGREEMENT, and is that license non-transferable?",
+    "gold_spans": [
+      "Hydraspin hereby grants to Distributor an exclusive non-transferable and royalty-free right and license to use Hydraspin's Marks in connection with the advertising, promotion, marketing, distribution and sale of the Products in the Territory in accordance with Hydraspin's standards and instructions.",
+      "Hydraspin hereby grants to Distributor an exclusive non-transferable and royalty-free right and license to use Hydraspin's Marks in connection with the advertising, promotion, marketing, distribution and sale of the Products in the Territory in accordance with Hydraspin's standards and instructions."
+    ],
+    "gold_answer": null,
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  },
+  {
+    "id": "q_070",
+    "doc_stem": "waternowinc_20191120_10-q_ex-10.12_11900227_ex-10.12_distributor agreement",
+    "agreement_type": "Distributor",
+    "category": "Exclusivity",
+    "bucket": "yes_span",
+    "question": "Does the Waternowinc EXCLUSIVE DISTRIBUTOR AGREEMENT include an Exclusivity clause?",
+    "gold_spans": [
+      "Hydraspin hereby grants to Distributor an exclusive non-transferable and royalty-free right and license to use Hydraspin's Marks in connection with the advertising, promotion, marketing, distribution and sale of the Products in the Territory in accordance with Hydraspin's standards and instructions",
+      "Distributor shall be entitled to advertise, promote, market or<omitted>solicit any Customers that have a business presence outside the Territory, except that Distributor shall not conduct solicitation activities in any outside territory where Hydraspin is bound to an exclusive distributor agreement with a third party, provided that Hydraspin has notified Distributor in writing of its arrangements with the other distributor and of the territory which is subject to exclusivity in favor of the other distributor.",
+      "If this Agreement is extended beyond the Initial Term, as hereinafter defined, the number of Customer Locations to be secured to maintain exclusivity during the pendency of the Agreement shall be increased to 50 from 25.",
+      "Hydraspin hereby appoints Distributor, and Distributor hereby accepts appointment, as Hydraspin's exclusive distributor of the Products in the Territory during the term of this Agreement, subject to the terms and conditions of this Agreement, including, but not limited to, the satisfaction of the Performance Benchmarks.",
+      "Hydraspin certifies, stipulates, and agrees that the Hydraspin will deal exclusively with and through the Distributor in relation to the distribution of the Products in the Territory",
+      "In the event the Distributor loses exclusivity on a territory due to not meeting Performance Benchmarks, the Distributor shall maintain exclusivity on any and all existing Products that are in the field and operating at them time exclusivity if forfeited."
+    ],
+    "gold_answer": "Yes",
+    "expected_route": "corpus_technical",
+    "expected_abstain": false,
+    "split": "test"
+  }
+]

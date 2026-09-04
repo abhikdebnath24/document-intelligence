@@ -10,6 +10,8 @@ dependencies = [
     "pyyaml>=6.0",
     "typer>=0.15",
     "structlog>=24.4",
+    "pymupdf>=1.25",
+    "rapidfuzz>=3.11",
 ]
 
 [project.scripts]
@@ -96,8 +98,8 @@ testpaths = ["tests"]
 python_version = "3.12"
 strict = true
 mypy_path = "src"
-packages = ["docintel.config", "docintel.core"]
+packages = ["docintel.config", "docintel.core", "docintel.data", "docintel.evaluation"]
 
 [[tool.mypy.overrides]]
-module = ["torch", "torch.*"]
+module = ["torch", "torch.*", "fitz", "pymupdf", "rapidfuzz", "rapidfuzz.*"]
 ignore_missing_imports = true

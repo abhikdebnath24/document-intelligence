@@ -120,11 +120,14 @@ data/CUAD_v1/
   label_group_xlsx/                                        # IGNORED (duplicate of CSV)
 ```
 
-Verified facts (see chat log 2026-09-03):
+Verified facts (2026-09-03 sampling; 2026-09-04 full walk in WS1):
 
-- 510 PDFs, all sampled have a text layer; extracted text length matches TXT within 1%.
-- Folder path in `full_contract_pdf/` gives `agreement_type` metadata for free.
-- 4 PDF/TXT name mismatches (trailing space / case). 1 TXT is 0 bytes. Normalize stems with `.strip().lower()`.
+- 510 PDFs: 311 named `.PDF`, 199 `.pdf`. Walk every file and test `suffix.lower()`; `rglob("*.pdf")` returns 199.
+- All 50 eval docs have a text layer; `len(norm(pdf)) / len(norm(txt))` is inside `[0.97, 1.03]` for every one (no replacements needed).
+- Folder path is `Part_{I,II,III}/<type folder>/`. 28 folder spellings map to 25 canonical types (`License_Agreements` -> License, `Joint Venture _ Filing` -> Joint Venture, `Endorsement Agreement` -> Endorsement, `Affiliate Agreement(s)` -> Affiliate, `Agency Agreements` -> Agency, `Consulting Agreements` -> Consulting).
+- Join to `master_clauses.csv`: 506 of 510 PDFs. 3 have no CSV row (Harpoon, Leclanche, Kallo); 1 is a byte-identical duplicate (`ADUROBIOTECH ... CONSULTING AGREEMENT` vs `(1)`). Normalize stems with `.strip().lower()`, fall back to an alnum-only key for punctuation drift.
+- Some contracts ship as sibling files (`_Part1/_Part2`, `Franchise Agreement1/3`, `Manufacturing Agreement2/3/4`). Eval docs are restricted to single-member stem families so a question that names the contract has one valid `doc_id`.
+- Clause cells are Python list reprs (`"['June 8, 2010']"`), not JSON. Parse with `ast.literal_eval`. Absent labels are `[]`.
 - Gold `answer_start` offsets refer to TXT-derived context and do NOT align to PDF text. Match gold by normalized text, not offset.
 
 ### 3.2 Why PDF is the indexed source
@@ -142,9 +145,9 @@ TXT is used once per document as an extraction QA gate: `len(norm(pdf_text)) / l
 
 Target 400 docs (78% of 510), stratified over all 25 agreement types, deterministic seed.
 
-Rule: for each type take `round(0.78 * n_type)` docs (minimum 3 when `n_type >= 3`), then top up or trim from the largest types to land on exactly 400. Every type stays represented so per-type error analysis is possible.
+Rule: for each type take `round(0.78 * n_type)` docs (minimum 3 when `n_type >= 3`), then top up or trim one doc at a time from the type with the most leftover (top-up) or the most picked (trim) until exactly 400. Every type stays represented so per-type error analysis is possible. Implemented in `docintel.data.corpus.stratified_take` (seed 42). Result on 2026-09-04: 25 types, largest Maintenance 28, smallest Non-Compete 3.
 
-Hold-out: 50 of the 400 are `index_and_eval`. Sampling is weighted toward the Avathon-relevant types so questions read like procurement / vendor-risk review:
+Hold-out: 50 of the 400 are `index_and_eval`, drawn only from docs whose stem family has one member. Sampling is weighted toward the Avathon-relevant types so questions read like procurement / vendor-risk review:
 
 | Group | Types | Eval docs |
 |-------|-------|-----------|
@@ -155,7 +158,7 @@ Hold-out: 50 of the 400 are `index_and_eval`. Sampling is weighted toward the Av
 
 All 400 are indexed (retrieval must find the needle among decoys). Eval questions come only from the 50.
 
-Selection is recorded in `data_manifest/corpus_manifest.json` (committed; file stems, sha256, agreement type, group, split). Raw data is not committed. `corpus.limit_docs` in a profile shrinks this for smoke runs (`dev_cpu` uses 20).
+Selection is recorded in `data_manifest/corpus_manifest.json` (committed; `doc_stem`, `rel_path` under `pdf_root`, `txt_name` under `txt_root`, sha256, agreement type, group, split, `total_chars`, `est_tokens`, plus `unmatched` with a reason per skipped PDF). Raw data is not committed. `corpus.limit_docs` in a profile shrinks this for smoke runs (`dev_cpu` uses 20). `scripts/select_corpus.py --target 510` indexes every joinable doc.
 
 Sizing note: chunk count is measured by `select_corpus.py` (`total_chars`, `est_tokens`) and reported in `ingestion_report.json`, not assumed. Rough shape: 400 contracts x ~30-60k chars = 12-24M chars = ~3-6M tokens; at a 448-token stride (512 - 64) that is ~7-14k chunks, well within embedded Qdrant. Default embedder is `nomic-embed-text-v1.5`; OpenAI `text-embedding-3-small` is selected explicitly by profile (`dense_embedder.name: openai`), never inferred from key presence. Either finishes ingest in minutes. Extra chunker/embedder ablations each create a new collection; skip them if the clock is tight.
 
@@ -168,7 +171,9 @@ Built by `scripts/build_eval_set.py` from `master_clauses.csv` rows of the 50 ev
 | `qa_dev.json` | 30 of the 50 | ~40 | every ablation row; chunker / embedder / fusion / agent choices |
 | `qa_test.json` | the other 20 | ~30 (>= 20 required by the challenge) | run once per finalist config after the config hash is locked; the numbers in the write-up |
 
-Document-disjoint split means no test question shares a contract with a dev question. Both files are committed with a sha256 in `evals/README.md`; the L1/L2 runners record that sha alongside `config_hash`. Rubric "no test leakage" is answered by this split, not by the 400/50 corpus split alone (that one only keeps eval docs among decoys).
+Document-disjoint split means no test question shares a contract with a dev question. The 30/20 cut is a seeded shuffle inside each group, so both files keep the 24/16/10 mix (dev 14/10/6, test 10/6/4 docs). Both files are committed with a sha256 in `evals/README.md`; the L1/L2 runners record that sha alongside `config_hash`. Rubric "no test leakage" is answered by this split, not by the 400/50 corpus split alone (that one only keeps eval docs among decoys).
+
+Question text is template-generated per category (`docintel.data.evalset`). The owner may edit `question` wording in the JSON; `doc_stem`, `gold_spans`, `bucket` and `split` stay as generated so the sha in `evals/README.md` is the freeze point.
 
 Bucket targets below are for the union; each file keeps roughly the same proportions.
 
@@ -1130,23 +1135,22 @@ COMMIT after each: `build: bootstrap uv project and dependency groups`, `feat(co
 
 Depends on: WS0. Estimated: 5h. Can run in parallel with WS2 after manifest exists.
 
-Files: `scripts/select_corpus.py`, `scripts/build_eval_set.py`, `data_manifest/corpus_manifest.json`, `evals/qa_dev.json`, `evals/qa_test.json`, `evals/README.md`, `docs/DATA.md`, `src/docintel/evaluation/gold.py`, `tests/unit/test_span_matcher.py`.
+Files: `src/docintel/data/{corpus,evalset}.py`, `src/docintel/evaluation/gold.py`, `scripts/select_corpus.py`, `scripts/build_eval_set.py`, `data_manifest/corpus_manifest.json`, `evals/qa_dev.json`, `evals/qa_test.json`, `evals/README.md`, `docs/DATA.md`, `tests/unit/test_{corpus_select,eval_set,span_matcher}.py`.
 
 Tasks:
 
-1. `select_corpus.py`: walk `full_contract_pdf`, derive `agreement_type` from folder, stratified sample per section 3.3 with fixed seed, compute sha256, assign split; write manifest.
-2. Normalize stems; join to `master_clauses.csv` `Filename` column (strip `.pdf`, `.strip().lower()`); report unmatched.
-3. `build_eval_set.py`: for the 50 eval docs, sample categories per bucket table (>= 1 question per doc), emit draft questions with templates per category; owner hand-edits wording (~30 min) and adds the 4 general/out-of-scope items. Then split by document (seeded): 30 docs -> `qa_dev.json`, 20 docs -> `qa_test.json`; assert no `doc_stem` appears in both; write sha256 of each file to `evals/README.md`. Every doc in the eval split must pass the PDF/TXT ratio gate and have non-empty page provenance before the split is frozen; failures are replaced from the same agreement type.
-4. `evaluation/gold.py`: load set; `SpanMatcher(threshold)` with normalization and `<omitted>` handling; unit tests with synthetic cases (hyphenation, whitespace, omitted fragments).
-5. `docs/DATA.md`: source, license, subset rule, split, known data quirks (redactions, `<omitted>`, empty TXT, name mismatches).
+1. `data/corpus.py` + `scripts/select_corpus.py`: walk `full_contract_pdf` by suffix (case-insensitive), map folder -> canonical `agreement_type`, join `master_clauses.csv` (normalized stem, alnum-key fallback), dedupe by sha256, stratified sample per 3.3 with fixed seed, group-weighted eval hold-out from single-member stem families, PDF/TXT ratio gate on eval docs with same-type replacement; write manifest including `unmatched` reasons.
+2. `data/evalset.py` + `scripts/build_eval_set.py`: one question per eval doc first, then fill bucket quotas (slot 20, yes_span 24, no_answer 14, cross_ref 8) plus 4 general/out-of-scope items; clause cells parsed with `ast.literal_eval`; group-balanced seeded 30/20 document split; assert disjointness; write sha256 of each file to `evals/README.md`. Owner may edit question wording afterwards.
+3. `evaluation/gold.py`: `QAItem` schema (strict), `SpanMatcher(threshold)` with normalization (quotes, line-break hyphenation only, punctuation, whitespace), `<omitted>` fragment splitting, `doc_id` gate; `load_qa_set` / `dump_qa_set` / `file_sha256` / `assert_document_disjoint`.
+4. `docs/DATA.md`: source, license, subset rule, split, known data quirks (`.PDF` suffix, folder aliases, Python-repr cells, `<omitted>`, sibling files, unmatched PDFs).
 
-Acceptance:
+Acceptance (met 2026-09-04):
 
-- Manifest has 400 docs, 50 marked eval, every agreement type represented, all matched to CSV rows, `total_chars` per doc recorded.
-- `qa_dev.json` (~40) + `qa_test.json` (~30, >= 20) across all buckets, document-disjoint; schema and disjointness validated by a test.
-- Span matcher tests green.
+- Manifest: 510 walked, 506 joinable, 400 selected, 50 eval, 25 types, 0 duplicate sha256, `total_chars` / `est_tokens` per doc, 4 `unmatched` with reasons.
+- `qa_dev.json` 40 items / 30 docs, `qa_test.json` 30 items / 20 docs; all 5 buckets present in each; document-disjoint; every eval doc has >= 1 question; validated by `tests/unit/test_eval_set.py`.
+- Span matcher, corpus selection and split tests green (`uv run pytest tests/unit`: 33).
 
-COMMIT after each: `feat(data): stratified corpus manifest builder`, `feat(eval): gold span matcher with omitted-fragment handling`, `data: dev/test eval sets v1 (document-disjoint, ~70 QA across 5 buckets)`, `docs: DATA.md`.
+COMMIT: `feat(data): WS1 corpus manifest, eval sets and span matcher`.
 
 **C1 PUBLISH** after acceptance. Do not start WS3 L1 runs until C1 is on GitHub (WS2 may start in parallel after the manifest COMMIT, then PUBLISH C1 when the eval set is frozen).
 

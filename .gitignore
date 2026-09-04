@@ -217,8 +217,8 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Local datasets (CUAD and derived indexes)
-data/
+# Local datasets (CUAD and derived indexes). Root-anchored: src/docintel/data/ is code.
+/data/
 
 # Local runtime artifacts (docintel)
 .qdrant/
