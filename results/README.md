@@ -12,5 +12,6 @@ Windows, after the nomic index exists:
 uv run python scripts/run_retrieval_eval.py --split dev --profile exp_dense_only
 uv run python scripts/run_retrieval_eval.py --split dev --profile exp_sparse_only
 uv run python scripts/run_retrieval_eval.py --split dev --profile exp_hybrid_rrf
+uv run python scripts/run_retrieval_eval.py --split dev --profile exp_hybrid_rerank_mxbai
 uv run python scripts/make_results_table.py
 ```

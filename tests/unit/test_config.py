@@ -21,13 +21,17 @@ def test_l1_retrieval_profiles_share_index_sig() -> None:
     dense = load_config("exp_dense_only", repo_root=ROOT)
     sparse = load_config("exp_sparse_only", repo_root=ROOT)
     hybrid = load_config("exp_hybrid_rrf", repo_root=ROOT)
+    rerank = load_config("exp_hybrid_rerank_mxbai", repo_root=ROOT)
     assert dense.retrieval.mode == "dense"
     assert sparse.retrieval.mode == "sparse"
     assert hybrid.retrieval.mode == "hybrid"
     assert hybrid.retrieval.fusion.name == "rrf"
+    assert rerank.retrieval.reranker.name == "cross_encoder"
+    assert rerank.retrieval.reranker.params["model_id"].endswith("xsmall-v1")
     assert index_sig(dense) == index_sig(base)
     assert index_sig(sparse) == index_sig(base)
     assert index_sig(hybrid) == index_sig(base)
+    assert index_sig(rerank) == index_sig(base)
     assert config_hash(dense) != config_hash(base)
 
 

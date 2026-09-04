@@ -37,11 +37,12 @@ class RetrievalPipeline:
         for transform in self.transforms:
             texts = [t for src in texts for t in transform.transform(src)]
         texts = list(dict.fromkeys(texts)) or [query.text]
+        retrieve_k = max(query.k, self.config.retrieval.k_candidates)
         lists: list[list[RetrievedChunk]] = []
         for text in texts:
             lists.append(
                 self.retriever.retrieve(
-                    RetrievalQuery(text=text, k=query.k, filters=filters, doc_id=query.doc_id)
+                    RetrievalQuery(text=text, k=retrieve_k, filters=filters, doc_id=query.doc_id)
                 )
             )
         fused = lists[0] if len(lists) == 1 else self.fusion.fuse(lists)

@@ -49,6 +49,7 @@ def main() -> int:
         lines.append(f"{cmd} exp_dense_only")
         lines.append(f"{cmd} exp_sparse_only")
         lines.append(f"{cmd} exp_hybrid_rrf")
+        lines.append(f"{cmd} exp_hybrid_rerank_mxbai")
         lines.append("uv run python scripts/make_results_table.py")
         lines.append("```")
     else:

@@ -11,7 +11,7 @@ from docintel.ingestion.factory import DENSE, SPARSE
 from docintel.ingestion.qdrant_indexer import QdrantIndexer, collection_name
 from docintel.retrieval.fusion import DBSFFusion, RRFFusion, WeightedFusion
 from docintel.retrieval.pipeline import RetrievalPipeline
-from docintel.retrieval.rerankers import NoOpReranker
+from docintel.retrieval.rerankers import CrossEncoderReranker, NoOpReranker
 from docintel.retrieval.retrievers import (
     ClientHybridRetriever,
     DenseRetriever,
@@ -81,9 +81,14 @@ def build_retrieval_pipeline(
         )
     else:
         retriever = ClientHybridRetriever(dense, sparse, store, fusion)
-    reranker = NoOpReranker()
-    if ret.reranker.name != "none":
-        raise ValueError(f"reranker {ret.reranker.name!r} is not implemented (WS3 default is none)")
+    if ret.reranker.name == "none":
+        reranker: NoOpReranker | CrossEncoderReranker = NoOpReranker()
+    elif ret.reranker.name == "cross_encoder":
+        reranker = CrossEncoderReranker(**ret.reranker.params)
+    else:
+        raise ValueError(
+            f"reranker {ret.reranker.name!r} is not implemented (use none or cross_encoder)"
+        )
     unknown = set(ret.query_transforms) - _KNOWN_TRANSFORMS
     if unknown:
         raise ValueError(f"unknown query_transforms {sorted(unknown)}")
