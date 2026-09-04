@@ -59,6 +59,7 @@ class RetrievedChunk(BaseModel):
     score: float
     source: RetrievalSource
     rank: int
+    provenance: list[str] = Field(default_factory=list)
 
 
 class Citation(BaseModel):

@@ -1,0 +1,5 @@
+# L1 row 2. Qdrant named sparse (fastembed BM25 + IDF). Same collection as nomic ingest.
+retrieval:
+  mode: sparse
+  hybrid_impl: client_side
+  query_transforms: [filter_extractor]

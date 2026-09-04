@@ -16,6 +16,21 @@ from docintel.core.errors import ConfigError
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def test_l1_retrieval_profiles_share_index_sig() -> None:
+    base = load_config("base", repo_root=ROOT)
+    dense = load_config("exp_dense_only", repo_root=ROOT)
+    sparse = load_config("exp_sparse_only", repo_root=ROOT)
+    hybrid = load_config("exp_hybrid_rrf", repo_root=ROOT)
+    assert dense.retrieval.mode == "dense"
+    assert sparse.retrieval.mode == "sparse"
+    assert hybrid.retrieval.mode == "hybrid"
+    assert hybrid.retrieval.fusion.name == "rrf"
+    assert index_sig(dense) == index_sig(base)
+    assert index_sig(sparse) == index_sig(base)
+    assert index_sig(hybrid) == index_sig(base)
+    assert config_hash(dense) != config_hash(base)
+
+
 def test_openai_and_fixed_chunk_profiles_load() -> None:
     openai = load_config("openai_embed", repo_root=ROOT)
     assert openai.ingestion.dense_embedder.name == "openai"

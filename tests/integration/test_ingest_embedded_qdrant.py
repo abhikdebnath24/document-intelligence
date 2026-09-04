@@ -72,6 +72,14 @@ def test_ingest_three_pdfs_round_trip(tmp_path: Path) -> None:
     hits = pipe.store.search_dense(pipe.dense.embed_query("termination for convenience"), k=3)
     assert hits
     assert hits[0].chunk.doc_id in {"a", "b", "c"}
+    fused = pipe.store.search_hybrid(
+        pipe.dense.embed_query("termination for convenience"),
+        pipe.sparse.encode_query("termination for convenience"),
+        k=3,
+        fusion="rrf",
+    )
+    assert fused
+    assert fused[0].source == "fused"
 
     again = pipe.run(paths=pdfs, only_changed=True)
     assert again.indexed == 0

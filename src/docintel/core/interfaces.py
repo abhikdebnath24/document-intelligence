@@ -97,6 +97,7 @@ class BaseVectorStore(ABC):
         k: int,
         fusion: str,
         filters: dict[str, Any] | None = None,
+        fusion_k: int = 60,
     ) -> list[RetrievedChunk]: ...
 
 

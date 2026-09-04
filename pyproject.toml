@@ -106,6 +106,7 @@ packages = [
     "docintel.data",
     "docintel.evaluation",
     "docintel.ingestion",
+    "docintel.retrieval",
 ]
 
 [[tool.mypy.overrides]]

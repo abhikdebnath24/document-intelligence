@@ -32,6 +32,8 @@ def _sparse_model(vec: SparseVector) -> models.SparseVector:
 
 
 def _match(key: str, value: Any) -> models.FieldCondition:
+    if isinstance(value, list | tuple | set):
+        return models.FieldCondition(key=key, match=models.MatchAny(any=list(value)))
     return models.FieldCondition(key=key, match=models.MatchValue(value=value))
 
 
@@ -220,12 +222,18 @@ class QdrantIndexer(BaseVectorStore):
                 section_header=payload.get("section_header"),
                 chunk_idx=int(payload.get("chunk_idx") or 0),
                 char_span=None,
-                metadata={"sha256": payload.get("sha256")},
+                metadata={
+                    "sha256": payload.get("sha256"),
+                    "agreement_type": payload.get("agreement_type"),
+                },
             )
-            out.append(
-                RetrievedChunk(chunk=chunk, score=float(hit.score), source=source, rank=rank)
-            )
+            # scroll() yields Record without .score
+            score = float(getattr(hit, "score", 0.0) or 0.0)
+            out.append(RetrievedChunk(chunk=chunk, score=score, source=source, rank=rank))
         return out
+
+    def has_collection(self, name: str) -> bool:
+        return name in {c.name for c in self._client.get_collections().collections}
 
     def search_dense(
         self, q: Sequence[float], k: int, filters: dict[str, Any] | None = None
@@ -260,5 +268,46 @@ class QdrantIndexer(BaseVectorStore):
         k: int,
         fusion: str,
         filters: dict[str, Any] | None = None,
+        fusion_k: int = 60,
     ) -> list[RetrievedChunk]:
-        raise NotImplementedError("hybrid search is WS3")
+        # qdrant 1.19: RrfQuery for RRF (k is first-class); FusionQuery for DBSF.
+        # https://qdrant.tech/documentation/concepts/hybrid-queries/
+        pre_k = max(k, 20)
+        filt = self._filter(filters)
+        prefetch = [
+            models.Prefetch(query=list(qd), using=DENSE_NAME, limit=pre_k, filter=filt),
+            models.Prefetch(query=_sparse_model(qs), using=SPARSE_NAME, limit=pre_k, filter=filt),
+        ]
+        name = fusion.lower()
+        if name == "rrf":
+            query: Any = models.RrfQuery(rrf=models.Rrf(k=int(fusion_k)))
+        elif name == "dbsf":
+            query = models.FusionQuery(fusion=models.Fusion.DBSF)
+        else:
+            raise ValueError(f"qdrant_native fusion {fusion!r} is not rrf or dbsf")
+        result = self._client.query_points(
+            collection_name=self._name,
+            prefetch=prefetch,
+            query=query,
+            query_filter=filt,
+            limit=k,
+            with_payload=True,
+        )
+        return self._to_retrieved(result.points, "fused")
+
+    def scroll_chunks(self) -> list[RetrievedChunk]:
+        offset: Any = None
+        out: list[RetrievedChunk] = []
+        while True:
+            records, offset = self._client.scroll(
+                collection_name=self._name,
+                scroll_filter=self._filter(None),
+                limit=256,
+                offset=offset,
+                with_payload=True,
+                with_vectors=False,
+            )
+            out.extend(self._to_retrieved(records, "sparse"))
+            if offset is None:
+                break
+        return out

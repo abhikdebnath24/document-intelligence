@@ -1,0 +1,9 @@
+# L1 row 3. Client-side RRF over dense + sparse. Same collection as nomic ingest.
+retrieval:
+  mode: hybrid
+  hybrid_impl: client_side
+  fusion:
+    name: rrf
+    params:
+      k: 60
+  query_transforms: [filter_extractor]

@@ -1,0 +1,2 @@
+# Locked after WS5 L1. One profile name per line.
+# --split test refuses any profile not listed here.

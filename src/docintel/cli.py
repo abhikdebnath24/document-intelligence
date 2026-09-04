@@ -66,20 +66,20 @@ def ingest(
             only_changed=only_changed,
             report_path=out,
         )
+        typer.echo(
+            f"collection={result.collection} indexed={result.indexed} "
+            f"skipped={result.skipped} failed={len(result.failed)} chunks={result.chunks}"
+        )
+        if result.eval_failures:
+            typer.echo(f"eval-split failures: {', '.join(result.eval_failures)}", err=True)
+        typer.echo(f"report={out}")
+        if result.failed:
+            raise typer.Exit(code=1)
     finally:
         # Embedded Qdrant must be closed before interpreter shutdown; otherwise its
         # finalizer can run after Python has torn down its import machinery.
         pipeline.store.close()
         pipeline.registry.close()
-    typer.echo(
-        f"collection={result.collection} indexed={result.indexed} "
-        f"skipped={result.skipped} failed={len(result.failed)} chunks={result.chunks}"
-    )
-    if result.eval_failures:
-        typer.echo(f"eval-split failures: {', '.join(result.eval_failures)}", err=True)
-    typer.echo(f"report={out}")
-    if result.failed:
-        raise typer.Exit(code=1)
 
 
 @app.command()
@@ -96,10 +96,21 @@ def query(
 def eval_cmd(
     profile: str = _PROFILE_OPT,
     split: str = typer.Option("dev", "--split"),
+    layer: str = typer.Option("L1", "--layer", help="L1 retrieval (WS3). L2 generation is WS5."),
+    scoped: bool = typer.Option(False, "--scoped", help="Force gold doc_id filter (diagnostic)."),
 ) -> None:
-    load_config(profile)
-    _ = split
-    _not_implemented("eval", "WS3/WS5")
+    cfg = load_config(profile)
+    if layer.upper() != "L1":
+        _not_implemented("eval L2", "WS5")
+    from docintel.evaluation.experiment import FinalistGateError, run_retrieval_eval
+
+    root = find_repo_root()
+    try:
+        path = run_retrieval_eval(cfg, split=split, repo_root=root, scoped=scoped)
+    except FinalistGateError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=2) from exc
+    typer.echo(str(path))
 
 
 @app.command()

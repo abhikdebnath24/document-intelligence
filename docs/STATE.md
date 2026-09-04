@@ -5,7 +5,7 @@ working session. One line per task; keep history in the changelog at the bottom.
 
 Status legend: `[ ]` pending  `[~]` in progress  `[x]` done  `[-]` dropped / deferred
 
-Last updated: 2026-09-04 (WS2 implemented on Mac; C2 pending Windows doctor + ingest)
+Last updated: 2026-09-05 (WS3 retrieval + L1 harness; origin/main = 5be2905; Windows nomic ingest done)
 
 ---
 
@@ -15,8 +15,8 @@ Last updated: 2026-09-04 (WS2 implemented on Mac; C2 pending Windows doctor + in
 |------------|--------|-------|
 | WS0 Bootstrap + config | [x] | Mac tests/ruff/mypy green. Windows `2.11.0+cu128 True NVIDIA GeForce RTX 5060 Laptop GPU`. C0 = `2acf9af` |
 | WS1 Data manifest + eval set | [x] | 510 walked, 400/50 manifest, 25 types, group-balanced qa_dev 40 / qa_test 30. C1 = `a5b134b` |
-| WS2 Ingestion | [~] | Mac: loaders, recursive+fixed_token, hash/st/openai/bm25, Qdrant prepare-then-swap, doctor. Reviewed; 47 tests, mypy strict. Open: Windows doctor + default-profile ingest, C2 |
-| WS3 Retrieval + L1 eval | [ ] | |
+| WS2 Ingestion | [x] | C2 = `5be2905` (Windows cleanup + embedding API). `gpu_default` nomic 400-doc ingest finished |
+| WS3 Retrieval + L1 eval | [~] | Code + unit tests on Mac. Dev L1 table (dense / sparse / hybrid RRF) still to run on Windows |
 | WS4 LLM + agentic graph | [ ] | |
 | WS5 Generation eval (RAGAS + DeepEval) + MLflow + ablations | [ ] | |
 | WS6 Feedback DB | [ ] | |
@@ -24,7 +24,7 @@ Last updated: 2026-09-04 (WS2 implemented on Mac; C2 pending Windows doctor + in
 | WS8 FastAPI + Qdrant server + load test | [-] | MAY / write-up next step. Docker not required |
 | WS9 Write-up + video | [ ] | |
 
-Current focus: WS2
+Current focus: WS3 L1 Windows runs (`exp_dense_only`, `exp_sparse_only`, `exp_hybrid_rrf`)
 
 Publish gates (tick only after personal-machine push + Mac `git fetch`):
 
@@ -32,7 +32,7 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 |------|-------|-----------|------|
 | C0 | WS0 | [x] | 2026-09-04 `2acf9af` |
 | C1 | WS1 | [x] | 2026-09-04 `a5b134b` |
-| C2 | WS2 | [ ] | |
+| C2 | WS2 | [x] | 2026-09-05 `5be2905` |
 | C3 | WS3 | [ ] | |
 | C4 | WS4 | [ ] | |
 | C5 | WS5 | [ ] | |
@@ -127,20 +127,20 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 - [x] CLI `docintel ingest --path/--only-changed|--full/--report`, `docintel doctor`
 - [x] tests: chunker invariants; header strip reaches blocks; 3-PDF embedded Qdrant; dim mismatch; mid-embed keeps old points then retries; second opener `QdrantInUseError`; manifest jobs. 47 passed; `mypy --strict` covers `docintel.ingestion`
 - [x] review pass: header strip now at block level (was dead on the PDF path); ratio gate uses pre-strip text; spans joined without spaces; page-number regex capped at 3 digits; `--only-changed` gate fixed and failed rows retried; nomic `trust_remote_code` fallback. Verified on 40 real CUAD PDFs: 0 ratio failures, ~48k header chars stripped, all chunks have bboxes
-- [ ] acceptance: `doctor` green on Windows (`uv sync --group gpu`); default-profile ingest (nomic or openai + BM25); incremental skip already proven in tests
-- [ ] **C2 PUBLISH**: bundle -> personal push -> Mac fetch. No raw ingest reports.
+- [x] acceptance: Windows `doctor --profile gpu_default` green. 400-doc nomic ingest finished
+- [x] **C2 PUBLISH**: `origin/main` = `5be2905`. WS3 unblocked.
 
 ## WS3: Retrieval + L1 eval
 
-- [ ] retrievers: dense, sparse_bm25_inproc, qdrant_hybrid, client_hybrid
-- [ ] fusion: rrf, dbsf, weighted
-- [ ] rerankers: none (default). MAY: mxbai-xsmall. Do not default to bge-m3 reranker
-- [ ] query transforms: filter_extractor, multi_query, hyde
-- [ ] `RetrievalPipeline` with per-stage provenance
-- [ ] `retrieval_metrics.py` (P@k, R@k, hit@k, MRR, nDCG; per bucket / type)
-- [ ] `experiment.py`, `scripts/run_retrieval_eval.py --split dev|test` (per-question checkpoint; test gated by `evals/finalists.txt`), `scripts/make_results_table.py`
-- [ ] profiles: exp_dense_only, exp_sparse_only, exp_hybrid_rrf (MUST). DBSF / rerank profiles MAY
-- [ ] acceptance: dev L1 table rows 1-3 (dense vs sparse vs hybrid RRF)
+- [x] retrievers: dense, sparse (Qdrant named BM25), qdrant_hybrid (`RrfQuery` / `FusionQuery.DBSF`), client_hybrid. `sparse_bm25_inproc` implemented, not the default sparse path
+- [x] fusion: rrf (k=60), dbsf (Qdrant 3-sigma), weighted(alpha)
+- [x] rerankers: none (default). MAY mxbai skipped
+- [x] query transforms: filter_extractor (company-segment catalog match -> `doc_id` or `doc_id IN` candidates; type from catalog; CUAD clause vocab stop-listed; no gold doc_id). On the 66 scored eval questions: 53 single doc, 12 candidate sets, 0 wrong filters (tested). multi_query / hyde are identity until WS4 LLM
+- [x] `RetrievalPipeline` with per-stage provenance
+- [x] `retrieval_metrics.py` (P@k, R@k any/all, hit@k, MRR, nDCG; per bucket / type). Abstention / general excluded
+- [x] `experiment.py`, `scripts/run_retrieval_eval.py --split dev|test` (per-question checkpoint; test gated by `evals/finalists.txt`), `scripts/make_results_table.py`
+- [x] profiles: exp_dense_only, exp_sparse_only, exp_hybrid_rrf (same `index_sig` as nomic ingest). DBSF / rerank profiles MAY
+- [ ] acceptance: dev L1 table rows 1-3 (dense vs sparse vs hybrid RRF) — run on Windows
 - [ ] **C3 PUBLISH**: bundle -> personal push -> Mac fetch. `results/README.md` only; no `per_question.jsonl`.
 
 ## WS4: LLM + agentic graph
@@ -255,3 +255,7 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 | 2026-09-04 | C1 closed. Personal push landed. Mac `git fetch` + ff: `origin/main` = `a5b134b` (noreply). WS2 unblocked. |
 | 2026-09-04 | WS2 on Mac: pymupdf+txt loaders, recursive+fixed_token, st/nomic/openai/fastembed BM25 (IDF), Qdrant 1.19 named vectors + prepare-then-swap registry, doctor. 44 tests. C2 blocked on Windows doctor + full ingest. |
 | 2026-09-04 | WS2 review: fixed dead header strip (blocks), ratio on pre-strip text, span join, page-number regex, `--only-changed` no-op + silent failed skips (`--resume` dropped), doctor hash false-fail, nomic remote-code fallback. 47 tests; mypy strict on ingestion. |
+| 2026-09-05 | C2 closed. Personal push landed. Mac `git fetch` + ff: `origin/main` = `f7908d4` (noreply). Windows doctor green; 400-doc ingest still to finish after reboot. |
+| 2026-09-05 | Windows ingest cleanup + embedding API warning: `origin/main` = `5be2905`. 400-doc nomic ingest finished. |
+| 2026-09-05 | WS3 on Mac: Qdrant 1.19 hybrid (`RrfQuery` / DBSF), client RRF/DBSF/weighted, filter_extractor, L1 metrics + checkpointed runner, three exp profiles. LangGraph deferred to WS4. L1 table not yet run. |
+| 2026-09-05 | WS3 review: chunk relevance = any whole gold span (was all; zeroed 31/52 multi-span questions); doc hint matches the company segment only, clause words stop-listed, ambiguous company -> `MatchAny` doc set instead of a title-derived type guess (title vs folder type disagreed 1/18); eval fails loudly on a missing collection; `--scoped` gets its own run dir; split validated; scroll `Record` has no score; fusion provenance is a union. 63 tests. |
