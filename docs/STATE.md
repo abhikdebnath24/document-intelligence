@@ -134,12 +134,12 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 
 - [x] retrievers: dense, sparse (Qdrant named BM25), qdrant_hybrid (`RrfQuery` / `FusionQuery.DBSF`), client_hybrid. `sparse_bm25_inproc` implemented, not the default sparse path
 - [x] fusion: rrf (k=60), dbsf (Qdrant 3-sigma), weighted(alpha)
-- [x] rerankers: none (default). MAY: `cross_encoder` (`mixedbread-ai/mxbai-rerank-xsmall-v1`, profile `exp_hybrid_rerank_mxbai`). Fetch 20, rerank to 10. Same index_sig as nomic ingest.
+- [x] rerankers: none (default). MAY: `cross_encoder` (`exp_hybrid_rerank_mxbai`, `exp_hybrid_rerank_mxbai_short` scores 256-token windows and max-pools per chunk, `exp_hybrid_rerank_bge` = `BAAI/bge-reranker-v2-m3`). Fetch 20, rerank to 10. Same index_sig as nomic ingest.
 - [x] query transforms: filter_extractor (company-segment catalog match -> `doc_id` or `doc_id IN` candidates; type from catalog; CUAD clause vocab stop-listed; no gold doc_id). On the 66 scored eval questions: 53 single doc, 12 candidate sets, 0 wrong filters (tested). multi_query / hyde are identity until WS4 LLM
 - [x] `RetrievalPipeline` with per-stage provenance
 - [x] `retrieval_metrics.py` (P@k, R@k any/all, hit@k, MRR, nDCG; per bucket / type). Abstention / general excluded
 - [x] `experiment.py`, `scripts/run_retrieval_eval.py --split dev|test` (per-question checkpoint; test gated by `evals/finalists.txt`), `scripts/make_results_table.py`
-- [x] profiles: exp_dense_only, exp_sparse_only, exp_hybrid_rrf, exp_hybrid_rerank_mxbai (same `index_sig` as nomic ingest). DBSF still MAY
+- [x] profiles: exp_dense_only, exp_sparse_only, exp_hybrid_rrf, exp_hybrid_rerank_mxbai, exp_hybrid_rerank_mxbai_short, exp_hybrid_rerank_bge (same `index_sig` as nomic ingest). DBSF still MAY
 - [ ] acceptance: dev L1 table rows 1-3 (dense vs sparse vs hybrid RRF) — run on Windows
 - [ ] **C3 PUBLISH**: bundle -> personal push -> Mac fetch. `results/README.md` only; no `per_question.jsonl`.
 

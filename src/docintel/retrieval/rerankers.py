@@ -25,12 +25,14 @@ class CrossEncoderReranker(BaseReranker):
         top_n: int = 10,
         device: str = "auto",
         batch_size: int = 16,
+        max_passage_tokens: int = 0,
         **_: object,
     ) -> None:
         self.model_id = model_id
         self.top_n = max(1, int(top_n))
         self.device = device
         self.batch_size = max(1, int(batch_size))
+        self.max_passage_tokens = max(0, int(max_passage_tokens))
         self._model: Any | None = None
 
     def rerank(
@@ -40,11 +42,21 @@ class CrossEncoderReranker(BaseReranker):
         if keep == 0:
             return []
         model = self._load()
-        pairs = [[query, row.chunk.text] for row in chunks]
-        scores = model.predict(pairs, batch_size=self.batch_size, show_progress_bar=False)
+        # One CE pair per window; chunk score = max over its windows so a gold span
+        # near the chunk tail is still visible to a 512-token cross-encoder.
+        pairs: list[list[str]] = []
+        owner: list[int] = []
+        for i, row in enumerate(chunks):
+            for window in self._windows(model, row.chunk.text):
+                pairs.append([query, window])
+                owner.append(i)
+        raw = model.predict(pairs, batch_size=self.batch_size, show_progress_bar=False)
+        scores = [float("-inf")] * len(chunks)
+        for i, s in zip(owner, raw, strict=True):
+            scores[i] = max(scores[i], float(s))
         ranked = sorted(
             zip(chunks, scores, strict=True),
-            key=lambda item: (-float(item[1]), item[0].chunk.chunk_id),
+            key=lambda item: (-item[1], item[0].chunk.chunk_id),
         )
         out: list[RetrievedChunk] = []
         for rank, (row, score) in enumerate(ranked[:keep], start=1):
@@ -66,6 +78,30 @@ class CrossEncoderReranker(BaseReranker):
 
             self._model = CrossEncoder(self.model_id, device=resolve_device(self.device))
         return self._model
+
+    def _windows(self, model: Any, text: str) -> list[str]:
+        """Overlapping windows of `max_passage_tokens` (stride n/2). 0 = whole chunk."""
+        n = self.max_passage_tokens
+        if n == 0:
+            return [text]
+        tok = getattr(model, "tokenizer", None)
+        if tok is not None:
+            units: list[Any] = tok.encode(text, add_special_tokens=False, verbose=False)
+        else:
+            # ponytail: whitespace units when the CrossEncoder tokenizer is absent (unit tests)
+            units = text.split()
+        step = max(1, n // 2)
+        out: list[str] = []
+        start = 0
+        while True:
+            piece = units[start : start + n]
+            if tok is not None:
+                out.append(str(tok.decode(piece, skip_special_tokens=True)))
+            else:
+                out.append(" ".join(piece))
+            if start + n >= len(units):
+                return out
+            start += step
 
 
 def _cut(chunks: Sequence[RetrievedChunk], top_n: int, tag: str) -> list[RetrievedChunk]:

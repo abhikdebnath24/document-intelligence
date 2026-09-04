@@ -1,0 +1,17 @@
+# L1 MAY row. Same index_sig as gpu_default nomic ingest. Heavier CE than mxbai-xsmall.
+retrieval:
+  mode: hybrid
+  hybrid_impl: client_side
+  k_candidates: 20
+  fusion:
+    name: rrf
+    params:
+      k: 60
+  reranker:
+    name: cross_encoder
+    params:
+      model_id: BAAI/bge-reranker-v2-m3
+      top_n: 10
+      device: auto
+      batch_size: 8
+  query_transforms: [filter_extractor]

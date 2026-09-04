@@ -1,0 +1,19 @@
+# L1 MAY row. Same index_sig. Score 256-token windows (stride 128), max per chunk, so the
+# whole 512-token chunk is visible to mxbai's 512-token pair limit.
+retrieval:
+  mode: hybrid
+  hybrid_impl: client_side
+  k_candidates: 20
+  fusion:
+    name: rrf
+    params:
+      k: 60
+  reranker:
+    name: cross_encoder
+    params:
+      model_id: mixedbread-ai/mxbai-rerank-xsmall-v1
+      top_n: 10
+      device: auto
+      batch_size: 16
+      max_passage_tokens: 256
+  query_transforms: [filter_extractor]

@@ -22,16 +22,22 @@ def test_l1_retrieval_profiles_share_index_sig() -> None:
     sparse = load_config("exp_sparse_only", repo_root=ROOT)
     hybrid = load_config("exp_hybrid_rrf", repo_root=ROOT)
     rerank = load_config("exp_hybrid_rerank_mxbai", repo_root=ROOT)
+    bge = load_config("exp_hybrid_rerank_bge", repo_root=ROOT)
+    short = load_config("exp_hybrid_rerank_mxbai_short", repo_root=ROOT)
     assert dense.retrieval.mode == "dense"
     assert sparse.retrieval.mode == "sparse"
     assert hybrid.retrieval.mode == "hybrid"
     assert hybrid.retrieval.fusion.name == "rrf"
     assert rerank.retrieval.reranker.name == "cross_encoder"
     assert rerank.retrieval.reranker.params["model_id"].endswith("xsmall-v1")
+    assert bge.retrieval.reranker.params["model_id"] == "BAAI/bge-reranker-v2-m3"
+    assert short.retrieval.reranker.params["max_passage_tokens"] == 256
     assert index_sig(dense) == index_sig(base)
     assert index_sig(sparse) == index_sig(base)
     assert index_sig(hybrid) == index_sig(base)
     assert index_sig(rerank) == index_sig(base)
+    assert index_sig(bge) == index_sig(base)
+    assert index_sig(short) == index_sig(base)
     assert config_hash(dense) != config_hash(base)
 
 
