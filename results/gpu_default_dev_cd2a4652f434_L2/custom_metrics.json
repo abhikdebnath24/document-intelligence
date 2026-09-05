@@ -1,0 +1,11 @@
+{
+  "n": 40.0,
+  "route_accuracy": 1.0,
+  "abstention_precision": 0.4,
+  "abstention_recall": 0.75,
+  "citation_validity": 1.0,
+  "mean_groundedness": 0.6052631578947368,
+  "latency_p50_ms": 48078.0,
+  "latency_p95_ms": 67375.0,
+  "llm_calls_per_query": 6.5
+}
