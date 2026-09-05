@@ -8,7 +8,6 @@ from docintel.core.interfaces import BaseDenseEmbedder, BaseFusion, BaseSparseEn
 from docintel.core.registry import Registry
 from docintel.data.corpus import load_manifest, normalize_stem
 from docintel.ingestion.factory import DENSE, SPARSE
-from docintel.ingestion.loaders import is_upload_path
 from docintel.ingestion.qdrant_indexer import QdrantIndexer, collection_name
 from docintel.ingestion.registry_store import DocumentRegistry
 from docintel.retrieval.fusion import DBSFFusion, RRFFusion, WeightedFusion
@@ -30,9 +29,8 @@ FUSIONS.register("dbsf")(DBSFFusion)
 FUSIONS.register("weighted")(WeightedFusion)
 
 
-def _catalog(
-    config: AppConfig, repo_root: Path
-) -> tuple[list[dict[str, str]], list[str]]:
+def _catalog(config: AppConfig, repo_root: Path) -> list[dict[str, str]]:
+    """Manifest rows plus indexed registry rows the manifest lacks (UI uploads)."""
     path = repo_root / config.corpus.manifest
     rows: list[dict[str, str]] = []
     if path.is_file():
@@ -46,16 +44,13 @@ def _catalog(
                 }
             )
     seen = {row["doc_id"] for row in rows}
-    upload_ids: list[str] = []
     registry = DocumentRegistry(config.feedback.db_url)
     try:
         records = registry.list_all()
     finally:
         registry.close()
     for rec in records:
-        if rec.status == "indexed" and is_upload_path(rec.source_path):
-            upload_ids.append(rec.doc_id)
-        if rec.doc_id in seen:
+        if rec.doc_id in seen or rec.status != "indexed":
             continue
         rows.append(
             {
@@ -64,7 +59,7 @@ def _catalog(
                 "agreement_type": rec.agreement_type,
             }
         )
-    return rows, upload_ids
+    return rows
 
 
 def build_retrieval_pipeline(
@@ -119,14 +114,12 @@ def build_retrieval_pipeline(
     # filter_extractor always runs inside RetrievalPipeline. multi_query / hyde stay
     # identity unless listed; rewrite lives in the WS4 graph, not here.
     transforms: list[IdentityTransform] = []
-    catalog, upload_ids = _catalog(config, repo_root)
     return RetrievalPipeline(
         config,
         retriever,
         fusion,
         reranker,
         transforms,
-        FilterExtractor(catalog),
-        upload_ids,
+        FilterExtractor(_catalog(config, repo_root)),
         catalog_fn=lambda: _catalog(config, repo_root),
     )

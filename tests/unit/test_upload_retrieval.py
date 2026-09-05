@@ -29,8 +29,8 @@ class _FakeRetriever:
     def retrieve(self, query: RetrievalQuery) -> list[RetrievedChunk]:
         filt = dict(query.filters or {})
         self.calls.append(filt)
-        if filt.get("doc_id") == ["up-1"]:
-            return [_row("upload-hit", "up-1")]
+        if filt.get("doc_id") == "securian-up":
+            return [_row("upload-hit", "securian-up")]
         return [_row("corpus-hit", "other")]
 
 
@@ -57,36 +57,29 @@ def test_with_unknown_type_keeps_uploads_visible() -> None:
         "Unknown",
     ]
     assert _with_unknown_type({}) == {}
+    assert _with_unknown_type({"agreement_type": "Unknown"}) == {"agreement_type": "Unknown"}
 
 
-def test_search_fuses_upload_doc_ids() -> None:
+def test_search_widens_type_filter_with_one_retrieve() -> None:
+    # One retrieve per query text. A second per-upload retrieve doubled the
+    # grader input and pushed rewrite-heavy questions past query_deadline_s.
     cfg = load_config("dev_cpu", repo_root=ROOT)
     fake = _FakeRetriever()
-    pipe = RetrievalPipeline(
-        cfg,
-        fake,
-        RRFFusion(),
-        NoOpReranker(),
-        [],
-        FilterExtractor([]),
-        ["up-1"],
-    )
-    rows = pipe.search(
+    pipe = RetrievalPipeline(cfg, fake, RRFFusion(), NoOpReranker(), [], FilterExtractor([]))
+    pipe.search(
         RetrievalQuery(
             text="what must Advantus do under the net investment income maintenance agreement?",
             k=5,
         )
     )
-    ids = {r.chunk.chunk_id for r in rows}
-    assert "upload-hit" in ids
-    assert fake.calls[0]["agreement_type"] == ["Maintenance", "Unknown"]
-    assert fake.calls[1] == {"doc_id": ["up-1"]}
+    assert len(fake.calls) == 1
+    assert fake.calls[0] == {"agreement_type": ["Maintenance", "Unknown"]}
 
 
-def test_search_rereads_upload_ids() -> None:
+def test_search_rereads_catalog_for_upload_doc_hint() -> None:
     cfg = load_config("dev_cpu", repo_root=ROOT)
     fake = _FakeRetriever()
-    box: list[str] = []
+    rows: list[dict[str, str]] = []
     pipe = RetrievalPipeline(
         cfg,
         fake,
@@ -94,12 +87,19 @@ def test_search_rereads_upload_ids() -> None:
         NoOpReranker(),
         [],
         FilterExtractor([]),
-        [],
-        catalog_fn=lambda: ([], list(box)),
+        catalog_fn=lambda: list(rows),
     )
-    pipe.search(RetrievalQuery(text="maintenance agreement waiver", k=5))
-    assert all("doc_id" not in c for c in fake.calls)
-    box.append("up-1")
+    q = RetrievalQuery(text="what must securianfundstrust reimburse", k=5)
+    pipe.search(q)
+    assert "doc_id" not in fake.calls[0]
+    rows.append(
+        {
+            "doc_id": "securian-up",
+            "doc_stem": "securianfundstrust_05_01_2012-maintenance agreement__deadbeef",
+            "agreement_type": "Unknown",
+        }
+    )
     fake.calls.clear()
-    pipe.search(RetrievalQuery(text="maintenance agreement waiver", k=5))
-    assert {"doc_id": ["up-1"]} in fake.calls
+    hits = pipe.search(q)
+    assert fake.calls[0]["doc_id"] == "securian-up"
+    assert {r.chunk.chunk_id for r in hits} == {"upload-hit"}
