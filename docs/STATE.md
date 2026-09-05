@@ -5,7 +5,7 @@ working session. One line per task; keep history in the changelog at the bottom.
 
 Status legend: `[ ]` pending  `[~]` in progress  `[x]` done  `[-]` dropped / deferred
 
-Last updated: 2026-09-05 (pulled custom L2 `e17ac23`; WS6 + MLflow sqlite COMMIT)
+Last updated: 2026-09-05 (WS7 Streamlit COMMIT on Mac; C7 PUBLISH open)
 
 ---
 
@@ -18,13 +18,13 @@ Last updated: 2026-09-05 (pulled custom L2 `e17ac23`; WS6 + MLflow sqlite COMMIT
 | WS2 Ingestion | [x] | C2 = `5be2905` (Windows cleanup + embedding API). `gpu_default` nomic 400-doc ingest finished |
 | WS3 Retrieval + L1 eval | [x] | Dev L1 on origin (`523d1cd`). Sparse leads; bge-m3 helps hybrid; bge-base loses to RRF. C3 not ticked |
 | WS4 LLM + agentic graph | [x] | Live cited / abstain / general on Windows `gpu_default`. Two curated traces in this commit. C4 not published |
-| WS5 Generation eval (RAGAS + DeepEval) + MLflow + ablations | [~] | Custom L2 on origin (`e17ac23`, hash `cd2a4652f434`). RAGAS / DeepEval / MLflow still open |
-| WS6 Feedback DB | [x] | SQLAlchemy 2 + analytics. C6 COMMIT this session; not published |
-| WS7 Streamlit (incl. Upload PDF) | [ ] | |
+| WS5 Generation eval (RAGAS + DeepEval) + MLflow + ablations | [~] | Origin `656ef30` has L2 custom/RAGAS/DeepEval JSON under `results/gpu_default_dev_cd2a4652f434_L2/`. C5 PUBLISH still open |
+| WS6 Feedback DB | [x] | SQLAlchemy 2 + analytics. C6 on origin via `1da485a` / `656ef30` |
+| WS7 Streamlit (incl. Upload PDF) | [~] | Code COMMIT this session. Live Windows demo / C7 PUBLISH open |
 | WS8 FastAPI + Qdrant server + load test | [-] | MAY / write-up next step. Docker not required |
 | WS9 Write-up + video | [ ] | |
 
-Current focus: Windows -- reuse `generation_outputs.jsonl` (do not delete). Re-run `--framework custom` once for MLflow sqlite, then `--framework all`. Do not lock `evals/finalists.txt` or `--split test`
+Current focus: Windows Streamlit e2e on `gpu_default` (chat live steps, citation PDF, rate, upload, experiments, analytics). Do not start a second eval/ingest against the same embedded Qdrant. Do not lock `evals/finalists.txt` or `--split test`.
 
 Publish gates (tick only after personal-machine push + Mac `git fetch`):
 
@@ -197,15 +197,16 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 
 ## WS7: Streamlit
 
-- [ ] client abstraction (inprocess / http)
-- [ ] chat page: answer, route badge, citations, trace expander
-- [ ] PDF viewer with bbox highlights
-- [ ] feedback widget
-- [ ] documents page with Upload PDF (uuid filename, magic bytes, size/page caps, external-API notice) -> incremental ingest -> immediately queryable
-- [ ] Streamlit bound to 127.0.0.1
-- [ ] experiments page (profile picker, results comparison, link to mlflow ui)
-- [ ] feedback analytics page
-- [ ] acceptance: end-to-end demo path works
+- [x] client abstraction (inprocess / http stub)
+- [x] chat page: answer, route badge, citations, trace expander, live `st.status(type="step")` per graph node
+- [x] PDF viewer with bbox highlights (pymupdf pixmap)
+- [x] feedback widget (`st.feedback` stars + tags)
+- [x] documents page with Upload PDF (uuid filename, magic bytes, size/page caps, external-API notice) -> incremental ingest -> immediately queryable
+- [x] Streamlit bound to 127.0.0.1 (`docintel serve` / Makefile `app`)
+- [x] experiments page (profile picker, results comparison, link to mlflow ui)
+- [x] feedback analytics page
+- [ ] acceptance: end-to-end demo path works (Windows `gpu_default`)
+- [x] **C7 COMMIT**: this session (noreply). Streamlit 1.63 `st.navigation` / `st.status(type="step")` / `st.feedback`. Process-global `cache_resource(max_entries=1)` so tab-close does not close shared embedded Qdrant
 - [ ] **C7 PUBLISH** (skip if WS7 deferred)
 
 ## WS8: FastAPI + Qdrant server + load test (MAY / deferred)
@@ -281,3 +282,5 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 | 2026-09-05 | WS6: SQLAlchemy feedback on the ingest `documents` table (column-compatible), plus `query_logs` / `feedback`. `sqlalchemy` moved to main deps. Analytics joins `cited_doc_ids`. QueryService now fills `cited_doc_ids` from citations. |
 | 2026-09-05 | MLflow 3.15 rejects `file:./mlruns`. Default `tracking_uri` is `sqlite:///mlflow.db` (not in `config_hash`). Setup errors skip tracking; caller-body errors still raise. |
 | 2026-09-05 | Pulled `e17ac23` (Gmail author, Windows): custom L2 artifacts under `results/gpu_default_dev_cd2a4652f434_L2/`. |
+| 2026-09-05 | Pulled `656ef30` (Gmail): RAGAS + DeepEval JSON, `framework_agreement.md`, `demo_queries.md`, RAGAS adapter patch. |
+| 2026-09-05 | WS7 Streamlit: inprocess client, live graph-step timeline, PDF bbox highlight, upload validation, experiments + analytics pages. `docintel serve` binds 127.0.0.1. 108 tests. C7 COMMIT; live demo / C7 PUBLISH open. |

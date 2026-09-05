@@ -17,11 +17,6 @@ log = get_logger(__name__)
 _PROFILE_OPT = typer.Option(load_settings().docintel_profile, "--profile", "-p")
 
 
-def _not_implemented(what: str, workstream: str) -> None:
-    typer.echo(f"{what} is not implemented yet ({workstream})", err=True)
-    raise typer.Exit(code=2)
-
-
 @app.callback()
 def _main(verbose: bool = typer.Option(False, "--verbose", "-v")) -> None:
     configure_logging("DEBUG" if verbose else "INFO")
@@ -159,8 +154,28 @@ def eval_cmd(
 
 @app.command()
 def serve(profile: str = _PROFILE_OPT) -> None:
+    import os
+    import subprocess
+    import sys
+
     load_config(profile)
-    _not_implemented("serve", "WS7/WS8")
+    os.environ["DOCINTEL_PROFILE"] = profile
+    root = find_repo_root()
+    app = root / "frontend" / "streamlit_app" / "app.py"
+    raise SystemExit(
+        subprocess.call(
+            [
+                sys.executable,
+                "-m",
+                "streamlit",
+                "run",
+                str(app),
+                "--server.address",
+                "127.0.0.1",
+            ],
+            cwd=root,
+        )
+    )
 
 
 @app.command()

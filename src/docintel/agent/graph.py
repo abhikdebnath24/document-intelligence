@@ -1,12 +1,49 @@
 from __future__ import annotations
 
-from typing import Any
+from collections.abc import Iterator
+from typing import Any, Literal
 
 from langgraph.graph import END, START, StateGraph
+from pydantic import BaseModel, ConfigDict
 
 from docintel.agent.nodes import Nodes
 from docintel.agent.runtime import AgentRuntime
 from docintel.agent.state import RAGState
+
+# LangGraph also emits these bookkeeping names; the UI should skip them.
+_SKIP_NODES = frozenset({START, END, "__start__", "__end__"})
+
+
+class GraphTick(BaseModel):
+    """One graph event for a live UI. `start` fires before the node body."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    kind: Literal["start", "end", "done"]
+    node: str = ""
+    state: Any = None
+
+
+STEP_LABELS: dict[str, str] = {
+    "classify_query": "Classifying the question",
+    "plan_retrieval": "Planning retrieval filters",
+    "retrieve_hybrid": "Searching dense + BM25",
+    "rerank": "Reranking candidates",
+    "grade_documents": "Grading retrieved chunks",
+    "rewrite_query": "Rewriting the query",
+    "generate": "Drafting the answer",
+    "verify_groundedness": "Checking claims against evidence",
+    "regenerate_strict": "Rewriting unsupported claims",
+    "abstain": "No supporting clause found",
+    "answer_general": "Answering from general knowledge",
+    "clarify": "Need a more specific question",
+    "refuse": "Refusing an out-of-scope question",
+    "finalize": "Packaging citations",
+}
+
+
+def step_label(node: str) -> str:
+    return STEP_LABELS.get(node, node.replace("_", " "))
 
 
 def build_graph(nodes: Nodes) -> Any:
@@ -70,21 +107,54 @@ def build_graph(nodes: Nodes) -> Any:
     return builder.compile()
 
 
+def _initial_state(question: str, history: list[dict[str, str]] | None) -> dict[str, Any]:
+    return {
+        "question": question,
+        "history": list(history or []),
+        "rewrites": 0,
+        "regen_count": 0,
+        "filters": {},
+        "timings": [],
+        "trace": [],
+    }
+
+
+def iter_graph(
+    rt: AgentRuntime, question: str, *, history: list[dict[str, str]] | None = None
+) -> Iterator[GraphTick]:
+    """Yield `start`/`end` per node, then `done` with the final state.
+
+    Uses LangGraph `stream_mode=["tasks", "values"]` so the UI can show the
+    node that is running, not only the one that just finished.
+    """
+    graph = build_graph(Nodes(rt))
+    last: RAGState | None = None
+    for mode, data in graph.stream(
+        _initial_state(question, history),
+        {"recursion_limit": 40},
+        stream_mode=["tasks", "values"],
+    ):
+        if mode == "values":
+            last = data
+            continue
+        if mode != "tasks" or not isinstance(data, dict):
+            continue
+        name = str(data.get("name") or "")
+        if not name or name in _SKIP_NODES:
+            continue
+        # start payload has `input`; result payload has `result` or `error`
+        kind: Literal["start", "end"] = "end" if ("result" in data or "error" in data) else "start"
+        yield GraphTick(kind=kind, node=name)
+    yield GraphTick(kind="done", state=last)
+
+
 def run_graph(
     rt: AgentRuntime, question: str, *, history: list[dict[str, str]] | None = None
 ) -> RAGState:
-    nodes = Nodes(rt)
-    graph = build_graph(nodes)
-    result = graph.invoke(
-        {
-            "question": question,
-            "history": list(history or []),
-            "rewrites": 0,
-            "regen_count": 0,
-            "filters": {},
-            "timings": [],
-            "trace": [],
-        },
-        {"recursion_limit": 40},
-    )
-    return result  # type: ignore[no-any-return]
+    last: RAGState | None = None
+    for tick in iter_graph(rt, question, history=history):
+        if tick.kind == "done":
+            last = tick.state
+    if last is None:
+        raise RuntimeError("graph finished without a values snapshot")
+    return last

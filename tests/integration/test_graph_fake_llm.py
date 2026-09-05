@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from docintel.agent.cache import ChunkCache
-from docintel.agent.graph import run_graph
+from docintel.agent.graph import iter_graph, run_graph, step_label
 from docintel.agent.runtime import AgentRuntime
 from docintel.config.loader import load_config
 from docintel.config.schema import TraceSink
@@ -284,3 +284,50 @@ def test_query_service_writes_trace(tmp_path: Path) -> None:
     text = path.read_text(encoding="utf-8")
     assert "classify_query" in text
     assert "finalize" in text
+
+
+def test_iter_graph_emits_start_before_done() -> None:
+    cfg = _cfg()
+    caller = ScriptedCaller(
+        {
+            "router": [RouteOut(route="general", reason="definition")],
+            "generation": ["Indemnity shifts loss between parties."],
+        }
+    )
+    starts: list[str] = []
+    final = None
+    for tick in iter_graph(_rt(cfg, caller, []), "What is an indemnity clause?"):
+        if tick.kind == "start":
+            starts.append(tick.node)
+        elif tick.kind == "done":
+            final = tick.state
+    assert starts[0] == "classify_query"
+    assert "answer_general" in starts
+    assert "finalize" in starts
+    assert final is not None
+    assert final["route"] == "general"
+    assert step_label("retrieve_hybrid") == "Searching dense + BM25"
+
+
+def test_ask_iter_yields_done_answer() -> None:
+    cfg = _cfg()
+    caller = ScriptedCaller({"router": [RouteOut(route="out_of_scope", reason="no")]})
+    container = Container(
+        cfg,
+        repo_root=ROOT,
+        caller=caller,
+        pipeline=FakePipeline([]),
+        prompts=load_prompts(),
+    )
+    svc = QueryService(container)
+    kinds = []
+    answer = None
+    for tick in svc.ask_iter("who won?"):
+        kinds.append(tick.kind)
+        if tick.kind == "done" and tick.state is not None:
+            answer = tick.state["answer"]
+    svc.close()
+    assert "start" in kinds
+    assert kinds[-1] == "done"
+    assert answer is not None
+    assert answer.route == "out_of_scope"

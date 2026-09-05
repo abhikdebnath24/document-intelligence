@@ -46,10 +46,19 @@ class DocumentRegistry:
     def close(self) -> None:
         self._conn.close()
 
+    def list_all(self) -> list[DocumentRecord]:
+        rows = self._conn.execute(
+            "SELECT * FROM documents ORDER BY agreement_type, doc_id"
+        ).fetchall()
+        return [self._row(r) for r in rows]
+
     def get(self, doc_id: str) -> DocumentRecord | None:
         row = self._conn.execute("SELECT * FROM documents WHERE doc_id = ?", (doc_id,)).fetchone()
         if row is None:
             return None
+        return self._row(row)
+
+    def _row(self, row: sqlite3.Row) -> DocumentRecord:
         return DocumentRecord(
             doc_id=row["doc_id"],
             source_path=row["source_path"],

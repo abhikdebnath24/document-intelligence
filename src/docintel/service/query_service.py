@@ -3,10 +3,12 @@ from __future__ import annotations
 import json
 import time
 import uuid
+from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 from docintel.agent.cache import ChunkCache
-from docintel.agent.graph import run_graph
+from docintel.agent.graph import GraphTick, iter_graph
 from docintel.config import config_hash
 from docintel.config.schema import TraceSink
 from docintel.core.types import Answer, QueryLog, Timing
@@ -18,14 +20,63 @@ class QueryService:
         self.container = container
         self.logs: list[QueryLog] = []
 
-    def ask(self, question: str, *, session_id: str | None = None) -> tuple[Answer, QueryLog]:
+    def ask(
+        self,
+        question: str,
+        *,
+        session_id: str | None = None,
+        history: list[dict[str, str]] | None = None,
+    ) -> tuple[Answer, QueryLog]:
+        answer: Answer | None = None
+        log: QueryLog | None = None
+        for tick in self.ask_iter(question, session_id=session_id, history=history):
+            if tick.kind == "done" and tick.state is not None:
+                answer = tick.state["answer"]
+                log = tick.state["log"]
+        if answer is None or log is None:
+            raise RuntimeError("ask_iter finished without a result")
+        return answer, log
+
+    def ask_iter(
+        self,
+        question: str,
+        *,
+        session_id: str | None = None,
+        history: list[dict[str, str]] | None = None,
+    ) -> Iterator[GraphTick]:
+        """Yield graph ticks, then a `done` tick whose `state` holds answer+log."""
         cfg = self.container.config
         if TraceSink.MLFLOW in cfg.tracing.sinks:
             self.container.bootstrap_mlflow()
         query_id = str(uuid.uuid4())
         started = time.monotonic()
         cache = ChunkCache()
-        state = run_graph(self.container.runtime(cache, query_id, started), question)
+        runtime = self.container.runtime(cache, query_id, started)
+        final = None
+        for tick in iter_graph(runtime, question, history=history):
+            if tick.kind == "done":
+                final = tick.state
+                continue
+            yield tick
+        if final is None:
+            raise RuntimeError("graph finished without a values snapshot")
+        answer, log = self._finish(final, cache, query_id, question, session_id, started)
+        self.logs.append(log)
+        yield GraphTick(kind="done", state={"answer": answer, "log": log, "graph": final})
+
+    def close(self) -> None:
+        self.container.close()
+
+    def _finish(
+        self,
+        state: dict[str, Any],
+        cache: ChunkCache,
+        query_id: str,
+        question: str,
+        session_id: str | None,
+        started: float,
+    ) -> tuple[Answer, QueryLog]:
+        cfg = self.container.config
         answer = Answer.model_validate(
             state.get("answer") or {"text": "", "route": "corpus_technical"}
         )
@@ -39,7 +90,8 @@ class QueryService:
         trace_path = None
         if TraceSink.JSONL in cfg.tracing.sinks:
             trace_dir = self.container.repo_root / cfg.tracing.jsonl_dir
-            trace_path = _write_trace(trace_dir, query_id, state.get("trace") or [])
+            raw_trace = state.get("trace") or []
+            trace_path = _write_trace(trace_dir, query_id, list(raw_trace))
         log = QueryLog(
             query_id=query_id,
             session_id=session_id,
@@ -59,11 +111,7 @@ class QueryService:
             retrieved_contexts=contexts,
             trace_path=str(trace_path) if trace_path else None,
         )
-        self.logs.append(log)
         return answer, log
-
-    def close(self) -> None:
-        self.container.close()
 
 
 _LLM_NODES = frozenset(
