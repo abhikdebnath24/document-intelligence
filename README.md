@@ -2,9 +2,6 @@
 
 Agentic hybrid RAG over commercial contracts (CUAD v1).
 
-**Walkthrough video (5 min):** [Watch on Google Drive](https://drive.google.com/file/d/1JXZiCq8sLWTL2jpr8RnIVhK_4RVcdJV-/view?usp=drive_link)  
-**Technical write-up:** [`docs/WRITEUP.pdf`](docs/WRITEUP.pdf) / [`docs/WRITEUP.md`](docs/WRITEUP.md)
-
 The system answers natural-language questions over the corpus, cites page-level evidence, abstains when the knowledge base does not support an answer, and answers ordinary world-knowledge questions from the LLM with a disclaimer. Every ingestion, retrieval, and generation stage is selected by YAML profile.
 
 Package name and CLI: `docintel`. Python **3.12** (not 3.13). Pins live in [`pyproject.toml`](pyproject.toml) and [`uv.lock`](uv.lock).
