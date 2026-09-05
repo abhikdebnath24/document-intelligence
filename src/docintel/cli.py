@@ -121,18 +121,37 @@ def query(
 def eval_cmd(
     profile: str = _PROFILE_OPT,
     split: str = typer.Option("dev", "--split"),
-    layer: str = typer.Option("L1", "--layer", help="L1 retrieval (WS3). L2 generation is WS5."),
+    layer: str = typer.Option("L1", "--layer", help="L1 retrieval or L2 generation."),
     scoped: bool = typer.Option(False, "--scoped", help="Force gold doc_id filter (diagnostic)."),
+    framework: str = typer.Option("all", "--framework", help="L2 only: all|ragas|deepeval|custom"),
 ) -> None:
     cfg = load_config(profile)
-    if layer.upper() != "L1":
-        _not_implemented("eval L2", "WS5")
-    from docintel.evaluation.experiment import FinalistGateError, run_retrieval_eval
+    from docintel.core.errors import MissingSecretError
+    from docintel.evaluation.experiment import FinalistGateError
 
     root = find_repo_root()
     try:
-        path = run_retrieval_eval(cfg, split=split, repo_root=root, scoped=scoped)
-    except FinalistGateError as exc:
+        if layer.upper() == "L1":
+            from docintel.evaluation.experiment import run_retrieval_eval
+
+            path = run_retrieval_eval(cfg, split=split, repo_root=root, scoped=scoped)
+        elif layer.upper() == "L2":
+            from docintel.evaluation.generation_eval import run_generation_eval
+
+            names = {
+                "all": ["ragas", "deepeval"],
+                "ragas": ["ragas"],
+                "deepeval": ["deepeval"],
+                "custom": [],
+            }.get(framework)
+            if names is None:
+                typer.echo(f"unknown --framework {framework!r}", err=True)
+                raise typer.Exit(code=2)
+            path = run_generation_eval(cfg, split=split, repo_root=root, frameworks=names)
+        else:
+            typer.echo(f"unknown --layer {layer!r}", err=True)
+            raise typer.Exit(code=2)
+    except (FinalistGateError, MissingSecretError) as exc:
         typer.echo(str(exc), err=True)
         raise typer.Exit(code=2) from exc
     typer.echo(str(path))

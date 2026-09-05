@@ -49,9 +49,10 @@ gpu = [
     "bm25s>=0.2",
 ]
 eval = [
-    "ragas>=0.2",
-    "deepeval>=2.0",
+    "ragas>=0.4.3,<0.5",
+    "deepeval>=3.0,<5",
     "mlflow>=2.19",
+    "anthropic>=0.40",
 ]
 frontend = [
     "streamlit>=1.41",
@@ -136,5 +137,13 @@ module = [
     "langgraph.*",
     "mlflow",
     "mlflow.*",
+    "ragas",
+    "ragas.*",
+    "deepeval",
+    "deepeval.*",
+    "anthropic",
+    "anthropic.*",
+    "google",
+    "google.*",
 ]
 ignore_missing_imports = true

@@ -99,9 +99,9 @@ evaluation:
   frameworks: [ragas]
   judge_role: judge
   ragas:
+    # answer_relevancy omitted: ragas 0.4 needs its own embeddings client for it
     metrics:
       - faithfulness
-      - answer_relevancy
       - context_precision_with_reference
       - context_recall
       - noise_sensitivity
@@ -114,7 +114,8 @@ evaluation:
       - contextual_recall
       - contextual_relevancy
     threshold: 0.7
-    geval_rubrics: []
+    geval_rubrics:
+      - The answer cites the governing clause from retrieved context and does not invent a jurisdiction.
   results_root: results
 
 tracking:

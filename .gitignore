@@ -227,6 +227,7 @@ traces/
 docintel.db
 *.db-journal
 results/*/per_question.jsonl
+results/*/generation_outputs.jsonl
 results/*/traces/
 .cache/
 *.bundle

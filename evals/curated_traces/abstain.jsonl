@@ -1,7 +1,15 @@
-{"node": "classify_query", "t_ms": 0.0, "outputs_summary": {"prompt_version": "classify-v1"}}
+{"node": "classify_query", "t_ms": 2234.0, "outputs_summary": {"prompt_version": "classify-v1"}}
 {"node": "plan_retrieval", "t_ms": 0.0, "outputs_summary": {}}
-{"node": "retrieve_hybrid", "t_ms": 0.0, "outputs_summary": {"n": 1}}
+{"node": "retrieve_hybrid", "t_ms": 12188.0, "outputs_summary": {"n": 1}}
 {"node": "rerank", "t_ms": 0.0, "outputs_summary": {"n": 1}}
-{"node": "grade_documents", "t_ms": 0.0, "outputs_summary": {"n_relevant": 0}}
+{"node": "grade_documents", "t_ms": 2031.0, "outputs_summary": {"n_relevant": 0}}
+{"node": "rewrite_query", "t_ms": 2250.0, "outputs_summary": {"prompt_version": "rewrite-v1"}}
+{"node": "retrieve_hybrid", "t_ms": 344.0, "outputs_summary": {"n": 21}}
+{"node": "rerank", "t_ms": 0.0, "outputs_summary": {"n": 21}}
+{"node": "grade_documents", "t_ms": 15531.0, "outputs_summary": {"n_relevant": 0}}
+{"node": "rewrite_query", "t_ms": 2156.0, "outputs_summary": {"prompt_version": "rewrite-v1"}}
+{"node": "retrieve_hybrid", "t_ms": 485.0, "outputs_summary": {"n": 25}}
+{"node": "rerank", "t_ms": 0.0, "outputs_summary": {"n": 25}}
+{"node": "grade_documents", "t_ms": 19375.0, "outputs_summary": {"n_relevant": 0}}
 {"node": "abstain", "t_ms": 0.0, "outputs_summary": {}}
 {"node": "finalize", "t_ms": 0.0, "outputs_summary": {}}

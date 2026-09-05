@@ -922,6 +922,7 @@ dev = [
     { name = "types-pyyaml" },
 ]
 eval = [
+    { name = "anthropic" },
     { name = "deepeval" },
     { name = "mlflow" },
     { name = "ragas" },
@@ -980,9 +981,10 @@ dev = [
     { name = "types-pyyaml", specifier = ">=6.0" },
 ]
 eval = [
-    { name = "deepeval", specifier = ">=2.0" },
+    { name = "anthropic", specifier = ">=0.40" },
+    { name = "deepeval", specifier = ">=3.0,<5" },
     { name = "mlflow", specifier = ">=2.19" },
-    { name = "ragas", specifier = ">=0.2" },
+    { name = "ragas", specifier = ">=0.4.3,<0.5" },
 ]
 frontend = [
     { name = "streamlit", specifier = ">=1.41" },

@@ -1,8 +1,16 @@
-{"node": "classify_query", "t_ms": 0.0, "outputs_summary": {"prompt_version": "classify-v1"}}
+{"node": "classify_query", "t_ms": 1844.0, "outputs_summary": {"prompt_version": "classify-v1"}}
 {"node": "plan_retrieval", "t_ms": 0.0, "outputs_summary": {}}
-{"node": "retrieve_hybrid", "t_ms": 0.0, "outputs_summary": {"n": 2}}
-{"node": "rerank", "t_ms": 0.0, "outputs_summary": {"n": 2}}
-{"node": "grade_documents", "t_ms": 0.0, "outputs_summary": {"n_relevant": 1}}
-{"node": "generate", "t_ms": 0.0, "outputs_summary": {"prompt_version": "generate-v1", "n_cites": 1}}
-{"node": "verify_groundedness", "t_ms": 0.0, "outputs_summary": {"grounded": true}}
+{"node": "retrieve_hybrid", "t_ms": 12156.0, "outputs_summary": {"n": 20}}
+{"node": "rerank", "t_ms": 0.0, "outputs_summary": {"n": 20}}
+{"node": "grade_documents", "t_ms": 13422.0, "outputs_summary": {"n_relevant": 0}}
+{"node": "rewrite_query", "t_ms": 2750.0, "outputs_summary": {"prompt_version": "rewrite-v1"}}
+{"node": "retrieve_hybrid", "t_ms": 421.0, "outputs_summary": {"n": 26}}
+{"node": "rerank", "t_ms": 0.0, "outputs_summary": {"n": 26}}
+{"node": "grade_documents", "t_ms": 17907.0, "outputs_summary": {"n_relevant": 1}}
+{"node": "rewrite_query", "t_ms": 2328.0, "outputs_summary": {"prompt_version": "rewrite-v1"}}
+{"node": "retrieve_hybrid", "t_ms": 407.0, "outputs_summary": {"n": 30}}
+{"node": "rerank", "t_ms": 0.0, "outputs_summary": {"n": 30}}
+{"node": "grade_documents", "t_ms": 19578.0, "outputs_summary": {"n_relevant": 2}}
+{"node": "generate", "t_ms": 6969.0, "outputs_summary": {"prompt_version": "generate-v1", "n_cites": 3}}
+{"node": "verify_groundedness", "t_ms": 1390.0, "outputs_summary": {"grounded": true}}
 {"node": "finalize", "t_ms": 0.0, "outputs_summary": {}}

@@ -132,6 +132,8 @@ class QueryLog(BaseModel):
     rewrites: int = 0
     latency_ms: int = 0
     token_usage: dict[str, int] = Field(default_factory=dict)
+    llm_calls: int = 0
+    retrieved_contexts: list[str] = Field(default_factory=list)
     trace_path: str | None = None
 
 

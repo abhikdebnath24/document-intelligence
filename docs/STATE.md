@@ -5,7 +5,7 @@ working session. One line per task; keep history in the changelog at the bottom.
 
 Status legend: `[ ]` pending  `[~]` in progress  `[x]` done  `[-]` dropped / deferred
 
-Last updated: 2026-09-05 (WS4 code + review on Mac; live CLI still Windows; C4 not published)
+Last updated: 2026-09-05 (WS5 COMMIT: both judge stacks stay; L2 live still Windows)
 
 ---
 
@@ -17,14 +17,14 @@ Last updated: 2026-09-05 (WS4 code + review on Mac; live CLI still Windows; C4 n
 | WS1 Data manifest + eval set | [x] | 510 walked, 400/50 manifest, 25 types, group-balanced qa_dev 40 / qa_test 30. C1 = `a5b134b` |
 | WS2 Ingestion | [x] | C2 = `5be2905` (Windows cleanup + embedding API). `gpu_default` nomic 400-doc ingest finished |
 | WS3 Retrieval + L1 eval | [x] | Dev L1 on origin (`523d1cd`). Sparse leads; bge-m3 helps hybrid; bge-base loses to RRF. C3 not ticked |
-| WS4 LLM + agentic graph | [~] | Factory + LangGraph + QueryService + fake-LLM tests on Mac. Live CLI / provider keys unverified |
-| WS5 Generation eval (RAGAS + DeepEval) + MLflow + ablations | [ ] | |
+| WS4 LLM + agentic graph | [x] | Live cited / abstain / general on Windows `gpu_default`. Two curated traces in this commit. C4 not published |
+| WS5 Generation eval (RAGAS + DeepEval) + MLflow + ablations | [~] | Both stacks shipped (RAGAS headline, DeepEval cross-check). No L2 numbers yet |
 | WS6 Feedback DB | [ ] | |
 | WS7 Streamlit (incl. Upload PDF) | [ ] | |
 | WS8 FastAPI + Qdrant server + load test | [-] | MAY / write-up next step. Docker not required |
 | WS9 Write-up + video | [ ] | |
 
-Current focus: WS4 live CLI smoke (`docintel query` with `ANTHROPIC_API_KEY`) then C4 traces. Do not start L2 / WS5 until cited + abstain + general work against a real index
+Current focus: Windows L2 on `qa_dev`. Headline pass `--framework ragas`; agreement pass `--framework all`. Do not lock `evals/finalists.txt` or run `--split test`
 
 Publish gates (tick only after personal-machine push + Mac `git fetch`):
 
@@ -59,6 +59,7 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 | 2026-09-03 | LLM via `init_chat_model("provider:model")`, role-based models | provider switch by config + env key only |
 | 2026-09-03 | RAGAS 0.4 and DeepEval both planned behind `BaseGenerationEvaluator`; custom deterministic metrics for L1 | cheap L1 for every ablation; LLM judge (Anthropic) only for finalists |
 | 2026-09-04 | RAGAS faithfulness is the declared headline; DeepEval is a SHOULD cross-check | avoid choosing the metric after seeing results |
+| 2026-09-05 | Keep both judge stacks in-repo | same names, different judges; `--framework all` writes `framework_agreement.md`; do not swap the headline after seeing scores |
 | 2026-09-04 | Eval split: document-disjoint `qa_dev` (~40) / `qa_test` (~30); test run once per finalist | rubric "no test leakage" |
 | 2026-09-04 | Collection named by `index_sig`; prepare-then-swap incremental ingest; registry `status` + `--resume` | plan review: alias collisions and delete-before-embed data loss |
 | 2026-09-04 | 72h budget confirmed; agentic default path (classify/grade/generate/verify + rewrite) kept | owner decision |
@@ -156,24 +157,30 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 - [x] abstain / general / clarify / refuse nodes
 - [x] `QueryService.ask()` + in-memory `QueryLog` + JSONL sink + optional `mlflow.langchain.autolog()` (skipped if mlflow missing)
 - [x] tests: fake-LLM graph (cited / abstain / general / refuse / clarify / rewrite cap / first-pass keep); factory missing key + retry + repair; adversarial-chunk fixture; 78 unit+graph tests green
-- [ ] acceptance: cited answer, abstention, general answer via live CLI; provider switch verified for: [ ] anthropic [ ] openai [ ] google_genai (unverified)
-- [x] saved traces: `evals/curated_traces/success.jsonl` [x] `evals/curated_traces/abstain.jsonl` (scripted; replace with live traces before C4)
+- [x] acceptance: cited / abstain / general via live CLI on Windows `gpu_default` (anthropic). openai / google_genai unverified
+- [x] saved traces: `evals/curated_traces/success.jsonl` (live `7a0a929d`, 3 cites, grounded) [x] `evals/curated_traces/abstain.jsonl` (live `34ccd431`, 2 rewrites, `n_relevant` 0)
+- [x] **C4 COMMIT**: traces in this commit (noreply). C4 PUBLISH still waits for the personal-machine push
 - [ ] **C4 PUBLISH**: bundle -> personal push -> Mac fetch. Two curated traces only.
 
 ## WS5: Generation eval (RAGAS + DeepEval) + MLflow + ablations
 
-- [ ] `frameworks/base.py` (`BaseGenerationEvaluator`, `EvalSample`, `EvalResult`)
-- [ ] `ragas_adapter.py` (collections API, judge via llm_factory)
-- [ ] `deepeval_adapter.py` (`DeepEvalBaseLLM` wrapper, 5 RAG metrics + G-Eval rubric)
-- [ ] `custom_metrics.py`: route accuracy, abstention P/R, citation validity, latency, tokens
-- [ ] `tracking.py`: MLflow run per experiment (params, metrics, artifacts, tags)
-- [ ] ablation ladder on `qa_dev`: rows 1-3 + 7 (MUST), rows 4-5 (SHOULD), rows 6, 8 (MAY)
+- [x] `frameworks/base.py` (`BaseGenerationEvaluator`, `EvalSample`, `EvalResult`, sample builder)
+- [x] `ragas_adapter.py`: RAGAS 0.4 collections `ascore()`; `llm_factory` + AsyncAnthropic/OpenAI client from judge role
+- [x] `deepeval_adapter.py`: LangChain judge with optional `schema`; 5 RAG metrics + G-Eval "cites the governing clause"
+- [x] `custom_metrics.py`: route accuracy, abstention P/R, citation validity, groundedness, latency p50/p95, llm_calls, tokens; Spearman agreement
+- [x] `tracking.py`: MLflow run per L2 experiment (params, metrics, artifacts, tags)
+- [x] `scripts/run_generation_eval.py` + `docintel eval --layer L2 --framework all|ragas|deepeval|custom`; `--split test` still gated
+- [x] `scripts/run_demo_queries.py` + `scripts/error_analysis.py` (no live outputs yet)
+- [x] unit tests: sample builder, custom metrics, agreement, fake RAGAS metric, kwargs gating, custom-only mode, schema-aware judge, L2 test gate (88 passed; mypy strict clean)
+- [x] review vs installed ragas 0.4.3 / deepeval 4.2.0: vertexai import shim, explicit `provider=`, per-sample missing-input skips (see changelog)
+- [ ] ablation ladder on `qa_dev`: rows 1-3 + 7 (MUST), rows 4-5 (SHOULD), rows 6, 8 (MAY). Windows only
 - [ ] `evals/finalists.txt` locked; finalists run once on `qa_test` (L1 + RAGAS)
 - [ ] `results/framework_agreement.md` (RAGAS vs DeepEval; SHOULD)
-- [ ] `scripts/run_demo_queries.py` -> `results/demo_queries.md` (>= 5 queries)
-- [ ] error analysis: top-20 misses with reason tags
-- [ ] acceptance: `results/README.md` complete with config_hash, qa_sha, index_sig, MLflow run ids, per-stage p50/p95, llm_calls_per_query, tokens; `mlflow ui` shows runs and traces
-- [x] headline eval framework: RAGAS faithfulness (declared up front; DeepEval is a cross-check)
+- [ ] `results/demo_queries.md` (>= 5 queries) from live `run_demo_queries.py`
+- [ ] error analysis: top-20 misses written from an L1 `per_question.jsonl`
+- [ ] acceptance: `results/README.md` complete with config_hash, qa_sha, index_sig, MLflow run ids, per-stage p50/p95, `llm_calls_per_query`, tokens; `mlflow ui` shows runs and traces
+- [x] headline eval framework: RAGAS faithfulness (declared up front; DeepEval stays as cross-check)
+- [x] **C5 COMMIT**: adapters + runner + custom metrics + curated traces. Live L2 / C5 PUBLISH still Windows
 - [ ] **C5 PUBLISH**: bundle -> personal push -> Mac fetch. Sanitized results + `demo_queries.md`; no `mlruns/`.
 
 ## WS6: Feedback DB
@@ -263,3 +270,7 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 | 2026-09-05 | WS3 L1 table on origin (`523d1cd`): sparse best rank; hybrid+bge-m3 best r@10; bge-base below RRF (slot collapse). |
 | 2026-09-05 | WS4 started on Mac: LangGraph 1.2 StateGraph, `init_chat_model`, QueryService, fake-LLM tests. Live CLI + provider keys still open. 76 tests; mypy on llm/agent/service/core green. |
 | 2026-09-05 | WS4 review: router `doc_hint`/`agreement_type` no longer become Qdrant payload filters (unknown key = zero hits = forced abstain); rewrite keeps first-pass candidates; 1 relevant chunk after the rewrite cap answers instead of abstaining; `structured()` falls back to raw+repair only on parse errors (API errors retry, not double-call); mlflow autolog imports `mlflow.langchain`; CLI catches `MissingSecretError` at container build. 78 tests. |
+| 2026-09-05 | WS4 live traces: success `7a0a929d` (3 cites, grounded), abstain `34ccd431` (2 rewrites, n_relevant 0). In `evals/curated_traces/`; C4 not committed. |
+| 2026-09-05 | WS5 Mac: RAGAS 0.4 collections `ascore()` + DeepEval schema-aware judge + custom metrics + MLflow tracking + L2 runner. Pin `ragas>=0.4.3,<0.5` and `deepeval>=3.0,<5`. No `qa_test`, no finalists. |
+| 2026-09-05 | WS5 review against installed ragas 0.4.3 / deepeval 4.2.0: `import ragas` breaks on `langchain_community.chat_models.vertexai` (gone in community 0.4) -> stub module shim; `llm_factory` does NOT infer provider from the client (default `openai`) -> pass `provider=`; reference/context-based metrics skipped per sample when gold or contexts are missing instead of scoring `""`; `--framework custom` no longer falls back to config frameworks; MLflow `file:./mlruns` anchored to repo root; L1 error-analysis picks the matching config hash; `tokens_per_query` omitted when usage is not captured; `eval` CLI catches `MissingSecretError`; `answer_relevancy` dropped from RAGAS list (needs embeddings client). mypy strict clean on `docintel.evaluation`. 88 tests. |
+| 2026-09-05 | Keep both judge stacks. RAGAS = write-up faithfulness. DeepEval = agreement report + answer/contextual relevancy. `--framework all` is the honesty path; default config stays `[ragas]`. C4 traces + WS5 code COMMIT on Mac. |

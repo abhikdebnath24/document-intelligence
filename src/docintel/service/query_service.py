@@ -32,6 +32,10 @@ class QueryService:
         answer.trace_id = query_id
         answer.timings = [Timing.model_validate(t) for t in (state.get("timings") or [])]
         latency_ms = int((time.monotonic() - started) * 1000)
+        ctx_ids = list(
+            state.get("relevant_ids") or state.get("ranked_ids") or state.get("candidate_ids") or []
+        )
+        contexts = [row.chunk.text for row in cache.get_many(ctx_ids)]
         trace_path = None
         if TraceSink.JSONL in cfg.tracing.sinks:
             trace_dir = self.container.repo_root / cfg.tracing.jsonl_dir
@@ -50,6 +54,8 @@ class QueryService:
             groundedness=answer.groundedness,
             rewrites=int(state.get("rewrites") or 0),
             latency_ms=latency_ms,
+            llm_calls=_llm_calls(answer.timings),
+            retrieved_contexts=contexts,
             trace_path=str(trace_path) if trace_path else None,
         )
         self.logs.append(log)
@@ -57,6 +63,26 @@ class QueryService:
 
     def close(self) -> None:
         self.container.close()
+
+
+_LLM_NODES = frozenset(
+    {
+        "classify_query",
+        "grade_documents",
+        "rewrite_query",
+        "generate",
+        "verify_groundedness",
+        "answer_general",
+        "clarify",
+        "refuse",
+    }
+)
+
+
+def _llm_calls(timings: list[Timing]) -> int:
+    # ponytail: one call per LLM node. Undercounts `llm_per_chunk` grading (n calls) and
+    # structured-output repair retries; upgrade path is a counter on LangChainCaller.
+    return sum(1 for t in timings if t.node in _LLM_NODES and t.t_ms > 0)
 
 
 def _write_trace(root: Path, query_id: str, events: list[dict[str, object]]) -> Path:
