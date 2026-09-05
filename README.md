@@ -415,8 +415,10 @@ uv run mypy
 | Doc | Contents |
 |-----|----------|
 | [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md) | Architecture, graph, models, evaluation |
+| [`docs/WRITEUP.pdf`](docs/WRITEUP.pdf) | Technical write-up (Track D) |
+| [`docs/WRITEUP.md`](docs/WRITEUP.md) | Same write-up as markdown |
 | [`docs/DATA.md`](docs/DATA.md) | CUAD join rules, split, known quirks |
 | [`evals/README.md`](evals/README.md) | Eval-set hashes and bucket counts |
 | [`results/README.md`](results/README.md) | L1 comparison table |
 
-Walkthrough video (5 min): add the public or unlisted URL here when recorded. Technical write-up (1-2 pages): add the PDF path or URL here.
+Walkthrough video (5 min): add the public or unlisted URL here when recorded.
