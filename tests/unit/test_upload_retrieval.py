@@ -81,3 +81,25 @@ def test_search_fuses_upload_doc_ids() -> None:
     assert "upload-hit" in ids
     assert fake.calls[0]["agreement_type"] == ["Maintenance", "Unknown"]
     assert fake.calls[1] == {"doc_id": ["up-1"]}
+
+
+def test_search_rereads_upload_ids() -> None:
+    cfg = load_config("dev_cpu", repo_root=ROOT)
+    fake = _FakeRetriever()
+    box: list[str] = []
+    pipe = RetrievalPipeline(
+        cfg,
+        fake,
+        RRFFusion(),
+        NoOpReranker(),
+        [],
+        FilterExtractor([]),
+        [],
+        catalog_fn=lambda: ([], list(box)),
+    )
+    pipe.search(RetrievalQuery(text="maintenance agreement waiver", k=5))
+    assert all("doc_id" not in c for c in fake.calls)
+    box.append("up-1")
+    fake.calls.clear()
+    pipe.search(RetrievalQuery(text="maintenance agreement waiver", k=5))
+    assert {"doc_id": ["up-1"]} in fake.calls

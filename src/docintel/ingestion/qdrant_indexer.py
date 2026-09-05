@@ -17,6 +17,7 @@ SPARSE_NAME = "sparse"
 FINGERPRINT_ID = str(uuid.uuid5(uuid.NAMESPACE_URL, "docintel:fingerprint"))
 POINT_NS = uuid.uuid5(uuid.NAMESPACE_URL, "docintel:point")
 _CLIENTS: dict[str, QdrantClient] = {}
+_REFS: dict[str, int] = {}
 
 
 def point_id(doc_id: str, content_hash: str, chunk_idx: int, index_sig: str) -> str:
@@ -61,12 +62,14 @@ class QdrantIndexer(BaseVectorStore):
         self._path = resolved
         if not force_new and resolved in _CLIENTS:
             self._client = _CLIENTS[resolved]
+            _REFS[resolved] = _REFS.get(resolved, 1) + 1
             return
         try:
             client = QdrantClient(path=resolved)
         except RuntimeError as exc:
             raise QdrantInUseError(str(exc)) from exc
         _CLIENTS[resolved] = client
+        _REFS[resolved] = 1
         self._client = client
 
     def alias(self) -> str:
@@ -74,6 +77,12 @@ class QdrantIndexer(BaseVectorStore):
 
     def close(self) -> None:
         path = getattr(self, "_path", None)
+        if path:
+            left = _REFS.get(path, 1) - 1
+            if left > 0:
+                _REFS[path] = left
+                return
+            _REFS.pop(path, None)
         try:
             self._client.close()
         except Exception:

@@ -27,6 +27,9 @@ class LazyPipeline:
             self._inner = build_retrieval_pipeline(self.config, repo_root=self.repo_root)
         return self._inner
 
+    def ensure(self) -> None:
+        self._get()
+
     def search(self, query: Any) -> Any:
         return self._get().search(query)
 

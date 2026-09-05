@@ -49,6 +49,11 @@ class QueryService:
         if TraceSink.MLFLOW in cfg.tracing.sinks:
             self.container.bootstrap_mlflow()
         query_id = str(uuid.uuid4())
+        # Nomic + Qdrant open stay off the 90s budget. A first ask after boot or
+        # ingest otherwise dies in retrieve_hybrid while the embedder is loading.
+        ensure = getattr(self.container.pipeline, "ensure", None)
+        if callable(ensure):
+            ensure()
         started = time.monotonic()
         cache = ChunkCache()
         runtime = self.container.runtime(cache, query_id, started)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 
 from docintel.config import AppConfig
 from docintel.core.interfaces import BaseFusion, BaseQueryTransform, BaseReranker, BaseRetriever
@@ -28,6 +28,7 @@ class RetrievalPipeline:
         transforms: Sequence[BaseQueryTransform],
         extractor: FilterExtractor,
         upload_ids: Sequence[str] | None = None,
+        catalog_fn: Callable[[], tuple[list[dict[str, str]], list[str]]] | None = None,
     ) -> None:
         self.config = config
         self.retriever = retriever
@@ -36,11 +37,19 @@ class RetrievalPipeline:
         self.transforms = list(transforms)
         self.extractor = extractor
         self.upload_ids = [i for i in (upload_ids or []) if i]
+        self.catalog_fn = catalog_fn
+
+    def _extractor_and_uploads(self) -> tuple[FilterExtractor, list[str]]:
+        if self.catalog_fn is None:
+            return self.extractor, self.upload_ids
+        rows, ids = self.catalog_fn()
+        return FilterExtractor(rows), [i for i in ids if i]
 
     def search(self, query: RetrievalQuery) -> list[RetrievedChunk]:
         """Fuse candidates. Rerank is a separate graph node / retrieve() step."""
+        extractor, upload_ids = self._extractor_and_uploads()
         flags = self.config.retrieval.filters
-        extracted = self.extractor.extract(
+        extracted = extractor.extract(
             query.text,
             use_agreement_type=flags.use_agreement_type,
             use_doc_hint=flags.use_doc_hint,
@@ -60,12 +69,12 @@ class RetrievalPipeline:
             )
             # UI uploads sit outside the 400-doc catalog. A type/doc filter or a
             # top-k drown would hide them; pull those doc_ids unfiltered and fuse.
-            if self.upload_ids:
+            if upload_ids:
                 extra = self.retriever.retrieve(
                     RetrievalQuery(
                         text=text,
                         k=retrieve_k,
-                        filters={"doc_id": list(self.upload_ids)},
+                        filters={"doc_id": list(upload_ids)},
                     )
                 )
                 if extra:

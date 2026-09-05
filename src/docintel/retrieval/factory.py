@@ -128,4 +128,5 @@ def build_retrieval_pipeline(
         transforms,
         FilterExtractor(catalog),
         upload_ids,
+        catalog_fn=lambda: _catalog(config, repo_root),
     )

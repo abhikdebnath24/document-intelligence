@@ -103,10 +103,9 @@ class InProcessClient:
             registry.close()
 
     def ingest_paths(self, paths: list[Path]) -> IngestReport:
-        # One embedded Qdrant lock: drop the query store before ingest writes.
-        if self._query is not None:
-            self._query.close()
-            self._query = None
+        # Keep the live query stack. Closing it reloads nomic inside the next
+        # query_deadline_s and times out. Ingest reuses the shared Qdrant client;
+        # catalog_fn re-reads upload ids on the next search.
         return self.ingest.ingest_paths(paths)
 
     def find_source(self, doc_id: str) -> Path | None:

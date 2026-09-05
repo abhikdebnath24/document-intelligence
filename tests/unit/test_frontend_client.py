@@ -7,6 +7,7 @@ from frontend.streamlit_app.client import InProcessClient, run_pdf_ingest
 from docintel.config import load_config
 from docintel.core.types import QueryLog
 from docintel.feedback.repository import SqlAlchemyFeedbackRepository
+from docintel.ingestion.pipeline import IngestReport
 from docintel.service.feedback_service import FeedbackService
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -37,6 +38,24 @@ def test_client_is_lazy_and_updates_one_feedback_row() -> None:
     assert rows[0].rating == 5
     assert rows[0].tags == ["good"]
     assert rows[0].comment == "fixed"
+    client.close()
+
+
+def test_ingest_keeps_live_query_service(tmp_path: Path) -> None:
+    config = load_config("dev_cpu", repo_root=ROOT)
+    repo = SqlAlchemyFeedbackRepository("sqlite:///:memory:")
+    client = InProcessClient(config, FeedbackService(repo), ROOT)
+    client._query = object()
+
+    class _Ing:
+        def ingest_paths(self, paths: list[Path], *, only_changed: bool = True) -> IngestReport:
+            _ = paths, only_changed
+            return IngestReport(profile="dev_cpu", index_sig="sig", collection="col", indexed=1)
+
+    client.ingest = _Ing()  # type: ignore[assignment]
+    client.ingest_paths([tmp_path / "x.pdf"])
+    assert client._query is not None
+    client._query = None
     client.close()
 
 

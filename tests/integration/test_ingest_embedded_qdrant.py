@@ -132,6 +132,16 @@ def test_dim_mismatch_rejected(tmp_path: Path) -> None:
     store.close()
 
 
+def test_shared_client_survives_other_close(tmp_path: Path) -> None:
+    path = str(tmp_path / "share")
+    keep = QdrantIndexer(path=path, mode="embedded", on_disk=False)
+    keep.ensure_collection("share__sig", 8, has_sparse=True, index_sig="c" * 64)
+    extra = QdrantIndexer(path=path, mode="embedded", on_disk=False)
+    extra.close()
+    keep.ensure_collection("share__sig", 8, has_sparse=True, index_sig="c" * 64)
+    keep.close()
+
+
 def test_second_opener_is_clear_error(tmp_path: Path) -> None:
     path = str(tmp_path / "lockme")
     first = QdrantIndexer(path=path, mode="embedded", on_disk=False)
