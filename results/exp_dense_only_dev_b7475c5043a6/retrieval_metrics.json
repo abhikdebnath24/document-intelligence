@@ -5,7 +5,7 @@
   "config_hash": "b7475c5043a6ca49781a9cc31f1180062cdcea15ff9490b486561d1524dfd27d",
   "index_sig": "be217ccb7628d9b7d6097f4a0a52b96594ef470faf33a4b021dd2fa99d5a9f30",
   "qa_sha": "a45f4c51835deac0c8dc1ae35a957567ef1974ed7e3b27077b5e57dec1b5de1c",
-  "git_sha": "8656d773813f7b6590e0442b2982967f7621384e",
+  "git_sha": "3ca136db92dde3a6febbf8865b1dd8f28cb9e503",
   "n": 30,
   "overall": {
     "mrr": 0.35124338624338625,
