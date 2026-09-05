@@ -29,14 +29,10 @@ def chat_page(client: RagClient) -> None:
         st.session_state.session_id = str(uuid.uuid4())
 
     question = st.chat_input("Ask a contract question, or anything the model knows")
-    left, right = st.columns([1.45, 1], gap="large")
-    with left:
-        for msg in st.session_state.messages:
-            _replay(msg)
-        if question:
-            _run_turn(client, question)
-    with right:
-        _source_panel(client)
+    for msg in st.session_state.messages:
+        _replay(client, msg)
+    if question:
+        _run_turn(client, question)
 
 
 def _run_turn(client: RagClient, question: str) -> None:
@@ -71,10 +67,10 @@ def _run_turn(client: RagClient, question: str) -> None:
         return
     record = {"role": "assistant", "answer": answer, "log": log, "steps": steps}
     st.session_state.messages.append(record)
-    _render_answer(record)
+    _render_answer(client, record)
 
 
-def _replay(msg: dict[str, object]) -> None:
+def _replay(client: RagClient, msg: dict[str, object]) -> None:
     if msg["role"] == "user":
         with st.chat_message("user"):
             st.write(str(msg["text"]))
@@ -85,10 +81,10 @@ def _replay(msg: dict[str, object]) -> None:
         with st.status(f"Done · {len(names)} steps", state="complete", expanded=False):
             for node in names:
                 st.write(step_label(node))
-    _render_answer(msg)
+    _render_answer(client, msg)
 
 
-def _render_answer(msg: dict[str, object]) -> None:
+def _render_answer(client: RagClient, msg: dict[str, object]) -> None:
     answer: Answer = msg["answer"]  # type: ignore[assignment]
     log: QueryLog = msg["log"]  # type: ignore[assignment]
     with st.chat_message("assistant"):
@@ -107,9 +103,7 @@ def _render_answer(msg: dict[str, object]) -> None:
                 label = f"{cite.doc_id or cite.chunk_id}  p.{cite.page_no}"
                 if st.button(label, key=f"cite-{log.query_id}-{i}", width="stretch"):
                     st.session_state.selected_cite = cite
-                    st.session_state.selected_query_id = log.query_id
-                if cite.quote:
-                    st.caption(cite.quote)
+                    _cite_dialog(client)
         _feedback_widget(log.query_id)
         with st.expander("Trace JSON"):
             st.json(
@@ -143,37 +137,31 @@ def _feedback_widget(query_id: str) -> None:
         st.caption(f"Saved rating {saved}")
 
 
-def _source_panel(client: RagClient) -> None:
-    with st.container(border=True):
-        st.subheader("Source")
-        cite = st.session_state.get("selected_cite")
-        if not isinstance(cite, Citation):
-            st.caption("Click a citation to open the PDF page here.")
-            return
-        if st.button("Clear", key="clear-cite"):
-            st.session_state.pop("selected_cite", None)
-            st.session_state.pop("selected_query_id", None)
-            st.rerun()
-        if not cite.doc_id:
-            st.info(cite.quote or "No document id on this citation.")
-            return
-        path = client.find_source(cite.doc_id)
-        if path is None:
-            st.warning("PDF not on disk. Quote fallback:")
-            st.write(cite.quote)
-            return
-        boxes = highlight_boxes(cite)
-        if not boxes:
-            reason = (
-                "multi-page chunk"
-                if (cite.page_end or cite.page_no) != cite.page_no
-                else "no bboxes"
-            )
-            st.caption(f"{path.name} p.{cite.page_no} ({reason}; quote only)")
-            st.write(cite.quote)
-            return
-        png = render_cited_page(path, cite, dpi=client.config.frontend.pdf_render_dpi)
-        st.image(png, caption=f"{path.name}  p.{cite.page_no}", width="stretch")
+@st.dialog("Source", width="large")
+def _cite_dialog(client: RagClient) -> None:
+    cite = st.session_state.get("selected_cite")
+    if not isinstance(cite, Citation):
+        st.caption("Click a citation to open the PDF page.")
+        return
+    if not cite.doc_id:
+        st.info(cite.quote or "No document id on this citation.")
+        return
+    path = client.find_source(cite.doc_id)
+    if path is None:
+        st.warning("PDF not on disk. Quote fallback:")
+        st.write(cite.quote)
+        return
+    png = render_cited_page(path, cite, dpi=client.config.frontend.pdf_render_dpi)
+    note = ""
+    if not highlight_boxes(cite):
+        note = (
+            " · multi-page chunk, highlight off"
+            if (cite.page_end or cite.page_no) != cite.page_no
+            else " · no bboxes"
+        )
+    st.image(png, caption=f"{path.name}  p.{cite.page_no}{note}", width="stretch")
+    if cite.quote:
+        st.caption(cite.quote)
 
 
 def documents_page(client: RagClient) -> None:
