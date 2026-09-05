@@ -1,0 +1,68 @@
+from __future__ import annotations
+
+import json
+import time
+import uuid
+from pathlib import Path
+
+from docintel.agent.cache import ChunkCache
+from docintel.agent.graph import run_graph
+from docintel.config import config_hash
+from docintel.config.schema import TraceSink
+from docintel.core.types import Answer, QueryLog, Timing
+from docintel.service.container import Container
+
+
+class QueryService:
+    def __init__(self, container: Container) -> None:
+        self.container = container
+        self.logs: list[QueryLog] = []
+
+    def ask(self, question: str, *, session_id: str | None = None) -> tuple[Answer, QueryLog]:
+        cfg = self.container.config
+        if TraceSink.MLFLOW in cfg.tracing.sinks:
+            self.container.bootstrap_mlflow()
+        query_id = str(uuid.uuid4())
+        started = time.monotonic()
+        cache = ChunkCache()
+        state = run_graph(self.container.runtime(cache, query_id, started), question)
+        answer = Answer.model_validate(
+            state.get("answer") or {"text": "", "route": "corpus_technical"}
+        )
+        answer.trace_id = query_id
+        answer.timings = [Timing.model_validate(t) for t in (state.get("timings") or [])]
+        latency_ms = int((time.monotonic() - started) * 1000)
+        trace_path = None
+        if TraceSink.JSONL in cfg.tracing.sinks:
+            trace_dir = self.container.repo_root / cfg.tracing.jsonl_dir
+            trace_path = _write_trace(trace_dir, query_id, state.get("trace") or [])
+        log = QueryLog(
+            query_id=query_id,
+            session_id=session_id,
+            question=question,
+            route=answer.route,
+            config_hash=config_hash(cfg),
+            profile=cfg.profile,
+            retrieved_chunk_ids=list(state.get("ranked_ids") or state.get("candidate_ids") or []),
+            cited_chunk_ids=[c.chunk_id for c in answer.citations],
+            answer=answer.text,
+            abstained=answer.abstained,
+            groundedness=answer.groundedness,
+            rewrites=int(state.get("rewrites") or 0),
+            latency_ms=latency_ms,
+            trace_path=str(trace_path) if trace_path else None,
+        )
+        self.logs.append(log)
+        return answer, log
+
+    def close(self) -> None:
+        self.container.close()
+
+
+def _write_trace(root: Path, query_id: str, events: list[dict[str, object]]) -> Path:
+    root.mkdir(parents=True, exist_ok=True)
+    path = root / f"{query_id}.jsonl"
+    with path.open("w", encoding="utf-8") as fh:
+        for event in events:
+            fh.write(json.dumps(event, ensure_ascii=True) + "\n")
+    return path

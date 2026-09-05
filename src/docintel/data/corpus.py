@@ -48,37 +48,43 @@ _FOLDER_TO_TYPE = {
     "consulting agreements": "Consulting",
 }
 
-CORE_TYPES = frozenset({
-    "Supply",
-    "Manufacturing",
-    "Maintenance",
-    "Distributor",
-    "Outsourcing",
-    "Service",
-    "Transportation",
-})
-IP_TYPES = frozenset({
-    "License",
-    "IP",
-    "Joint Venture",
-    "Strategic Alliance",
-    "Collaboration",
-    "Development",
-})
-OTHER_TYPES = frozenset({
-    "Franchise",
-    "Reseller",
-    "Hosting",
-    "Agency",
-    "Marketing",
-    "Sponsorship",
-    "Endorsement",
-    "Promotion",
-    "Co-Branding",
-    "Affiliate",
-    "Consulting",
-    "Non-Compete",
-})
+CORE_TYPES = frozenset(
+    {
+        "Supply",
+        "Manufacturing",
+        "Maintenance",
+        "Distributor",
+        "Outsourcing",
+        "Service",
+        "Transportation",
+    }
+)
+IP_TYPES = frozenset(
+    {
+        "License",
+        "IP",
+        "Joint Venture",
+        "Strategic Alliance",
+        "Collaboration",
+        "Development",
+    }
+)
+OTHER_TYPES = frozenset(
+    {
+        "Franchise",
+        "Reseller",
+        "Hosting",
+        "Agency",
+        "Marketing",
+        "Sponsorship",
+        "Endorsement",
+        "Promotion",
+        "Co-Branding",
+        "Affiliate",
+        "Consulting",
+        "Non-Compete",
+    }
+)
 EVAL_QUOTAS = {"core": 24, "ip": 16, "other": 10}
 
 
@@ -287,11 +293,7 @@ def stratified_take(
         selected_n += 1
 
     while selected_n > target:
-        candidates = [
-            (len(bucket), t)
-            for t, bucket in picked.items()
-            if len(bucket) > 1
-        ]
+        candidates = [(len(bucket), t) for t, bucket in picked.items() if len(bucket) > 1]
         if not candidates:
             break
         _n_have, atype = max(candidates)
@@ -435,9 +437,11 @@ def apply_eval_ratio_gate(
     def _same_type_replacements(failed: InventoryDoc) -> list[InventoryDoc]:
         same_type = [d for d in index_pool if d.agreement_type == failed.agreement_type]
         same_group = [d for d in index_pool if d.group == failed.group]
-        return same_type + [d for d in same_group if d not in same_type] + [
-            d for d in index_pool if d not in same_type and d not in same_group
-        ]
+        return (
+            same_type
+            + [d for d in same_group if d not in same_type]
+            + [d for d in index_pool if d not in same_type and d not in same_group]
+        )
 
     for doc in eval_docs:
         check_pdf_txt(doc)

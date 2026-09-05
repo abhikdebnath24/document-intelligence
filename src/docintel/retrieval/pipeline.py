@@ -25,7 +25,8 @@ class RetrievalPipeline:
         self.transforms = list(transforms)
         self.extractor = extractor
 
-    def retrieve(self, query: RetrievalQuery) -> list[RetrievedChunk]:
+    def search(self, query: RetrievalQuery) -> list[RetrievedChunk]:
+        """Fuse candidates. Rerank is a separate graph node / retrieve() step."""
         flags = self.config.retrieval.filters
         extracted = self.extractor.extract(
             query.text,
@@ -45,8 +46,10 @@ class RetrievalPipeline:
                     RetrievalQuery(text=text, k=retrieve_k, filters=filters, doc_id=query.doc_id)
                 )
             )
-        fused = lists[0] if len(lists) == 1 else self.fusion.fuse(lists)
-        return self.reranker.rerank(query.text, fused, query.k)
+        return lists[0] if len(lists) == 1 else self.fusion.fuse(lists)
+
+    def retrieve(self, query: RetrievalQuery) -> list[RetrievedChunk]:
+        return self.reranker.rerank(query.text, self.search(query), query.k)
 
     def close(self) -> None:
         store = getattr(self.retriever, "store", None)

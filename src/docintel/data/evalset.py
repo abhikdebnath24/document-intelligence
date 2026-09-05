@@ -132,10 +132,7 @@ def _question(bucket: str, category: str, display: str) -> str:
                 f"What is the expiration date of the {display}, "
                 "and from which effective date is that term measured?"
             )
-        return (
-            f"What license grant appears in the {display}, "
-            "and is that license non-transferable?"
-        )
+        return f"What license grant appears in the {display}, and is that license non-transferable?"
     article = "an" if category[:1].lower() in "aeiou" else "a"
     return f"Does the {display} include {article} {category} clause?"
 

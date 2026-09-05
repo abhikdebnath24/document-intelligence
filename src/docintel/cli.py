@@ -87,9 +87,34 @@ def query(
     question: str = typer.Argument(...),
     profile: str = _PROFILE_OPT,
 ) -> None:
-    load_config(profile)
-    _ = question
-    _not_implemented("query", "WS4")
+    cfg = load_config(profile)
+    from docintel.core.errors import DeadlineExceeded, MissingSecretError
+    from docintel.service.container import Container
+    from docintel.service.query_service import QueryService
+
+    root = find_repo_root()
+    svc: QueryService | None = None
+    try:
+        # Container builds chat models eagerly; a missing key raises here, not in ask()
+        svc = QueryService(Container(cfg, repo_root=root))
+        answer, log = svc.ask(question)
+    except MissingSecretError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=2) from exc
+    except DeadlineExceeded as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(code=1) from exc
+    finally:
+        if svc is not None:
+            svc.close()
+    typer.echo(answer.text)
+    if answer.abstained:
+        typer.echo("abstained=true")
+    typer.echo(f"route={answer.route} groundedness={answer.groundedness}")
+    for cite in answer.citations:
+        typer.echo(f"  [{cite.chunk_id}] p.{cite.page_no} {cite.quote[:160]}")
+    if log.trace_path:
+        typer.echo(f"trace={log.trace_path}")
 
 
 @app.command("eval")

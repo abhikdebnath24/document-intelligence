@@ -893,6 +893,11 @@ name = "docintel"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "langchain" },
+    { name = "langchain-anthropic" },
+    { name = "langchain-google-genai" },
+    { name = "langchain-openai" },
+    { name = "langgraph" },
     { name = "openai" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -937,11 +942,6 @@ gpu = [
     { name = "torch", version = "2.14.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
 ]
 llm = [
-    { name = "langchain" },
-    { name = "langchain-anthropic" },
-    { name = "langchain-google-genai" },
-    { name = "langchain-openai" },
-    { name = "langgraph" },
     { name = "sqlalchemy" },
 ]
 phoenix = [
@@ -951,6 +951,11 @@ phoenix = [
 
 [package.metadata]
 requires-dist = [
+    { name = "langchain", specifier = ">=0.3" },
+    { name = "langchain-anthropic", specifier = ">=0.3" },
+    { name = "langchain-google-genai", specifier = ">=2.0" },
+    { name = "langchain-openai", specifier = ">=0.3" },
+    { name = "langgraph", specifier = ">=0.2" },
     { name = "openai", specifier = ">=1.60" },
     { name = "pydantic", specifier = ">=2.10" },
     { name = "pydantic-settings", specifier = ">=2.7" },
@@ -994,14 +999,7 @@ gpu = [
     { name = "torch", marker = "sys_platform == 'darwin'", specifier = ">=2.7", index = "https://download.pytorch.org/whl/cpu" },
     { name = "torch", marker = "sys_platform == 'win32'", specifier = ">=2.7", index = "https://download.pytorch.org/whl/cu128" },
 ]
-llm = [
-    { name = "langchain", specifier = ">=0.3" },
-    { name = "langchain-anthropic", specifier = ">=0.3" },
-    { name = "langchain-google-genai", specifier = ">=2.0" },
-    { name = "langchain-openai", specifier = ">=0.3" },
-    { name = "langgraph", specifier = ">=0.2" },
-    { name = "sqlalchemy", specifier = ">=2.0" },
-]
+llm = [{ name = "sqlalchemy", specifier = ">=2.0" }]
 phoenix = [
     { name = "arize-phoenix", specifier = ">=8.0" },
     { name = "openinference-instrumentation-langchain", specifier = ">=0.1" },

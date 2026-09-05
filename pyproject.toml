@@ -14,6 +14,11 @@ dependencies = [
     "rapidfuzz>=3.11",
     "qdrant-client>=1.12",
     "openai>=1.60",
+    "langchain>=0.3",
+    "langchain-anthropic>=0.3",
+    "langchain-openai>=0.3",
+    "langchain-google-genai>=2.0",
+    "langgraph>=0.2",
 ]
 
 [project.scripts]
@@ -61,11 +66,6 @@ phoenix = [
     "openinference-instrumentation-langchain>=0.1",
 ]
 llm = [
-    "langchain>=0.3",
-    "langchain-anthropic>=0.3",
-    "langchain-openai>=0.3",
-    "langchain-google-genai>=2.0",
-    "langgraph>=0.2",
     "sqlalchemy>=2.0",
 ]
 
@@ -107,6 +107,9 @@ packages = [
     "docintel.evaluation",
     "docintel.ingestion",
     "docintel.retrieval",
+    "docintel.llm",
+    "docintel.agent",
+    "docintel.service",
 ]
 
 [[tool.mypy.overrides]]
@@ -125,5 +128,13 @@ module = [
     "fastembed.*",
     "sentence_transformers",
     "sentence_transformers.*",
+    "langchain",
+    "langchain.*",
+    "langchain_core",
+    "langchain_core.*",
+    "langgraph",
+    "langgraph.*",
+    "mlflow",
+    "mlflow.*",
 ]
 ignore_missing_imports = true

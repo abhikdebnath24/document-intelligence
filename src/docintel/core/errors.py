@@ -26,3 +26,11 @@ class CollectionMismatchError(DocIntelError):
 
 class QdrantInUseError(DocIntelError):
     """Embedded Qdrant path is locked by another opener in this process or another."""
+
+
+class DeadlineExceeded(DocIntelError):
+    """Whole-graph query_deadline_s elapsed."""
+
+
+class StructuredOutputError(DocIntelError):
+    """Chat model returned text that could not be parsed as the requested schema."""

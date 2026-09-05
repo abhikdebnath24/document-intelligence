@@ -5,7 +5,7 @@ working session. One line per task; keep history in the changelog at the bottom.
 
 Status legend: `[ ]` pending  `[~]` in progress  `[x]` done  `[-]` dropped / deferred
 
-Last updated: 2026-09-05 (WS3 retrieval + L1 harness; origin/main = 5be2905; Windows nomic ingest done)
+Last updated: 2026-09-05 (WS4 code + review on Mac; live CLI still Windows; C4 not published)
 
 ---
 
@@ -16,15 +16,15 @@ Last updated: 2026-09-05 (WS3 retrieval + L1 harness; origin/main = 5be2905; Win
 | WS0 Bootstrap + config | [x] | Mac tests/ruff/mypy green. Windows `2.11.0+cu128 True NVIDIA GeForce RTX 5060 Laptop GPU`. C0 = `2acf9af` |
 | WS1 Data manifest + eval set | [x] | 510 walked, 400/50 manifest, 25 types, group-balanced qa_dev 40 / qa_test 30. C1 = `a5b134b` |
 | WS2 Ingestion | [x] | C2 = `5be2905` (Windows cleanup + embedding API). `gpu_default` nomic 400-doc ingest finished |
-| WS3 Retrieval + L1 eval | [~] | Code + unit tests on Mac. Dev L1 table (dense / sparse / hybrid RRF) still to run on Windows |
-| WS4 LLM + agentic graph | [ ] | |
+| WS3 Retrieval + L1 eval | [x] | Dev L1 on origin (`523d1cd`). Sparse leads; bge-m3 helps hybrid; bge-base loses to RRF. C3 not ticked |
+| WS4 LLM + agentic graph | [~] | Factory + LangGraph + QueryService + fake-LLM tests on Mac. Live CLI / provider keys unverified |
 | WS5 Generation eval (RAGAS + DeepEval) + MLflow + ablations | [ ] | |
 | WS6 Feedback DB | [ ] | |
 | WS7 Streamlit (incl. Upload PDF) | [ ] | |
 | WS8 FastAPI + Qdrant server + load test | [-] | MAY / write-up next step. Docker not required |
 | WS9 Write-up + video | [ ] | |
 
-Current focus: WS3 L1 Windows runs (`exp_dense_only`, `exp_sparse_only`, `exp_hybrid_rrf`, `exp_hybrid_rerank_bge_base`, `exp_hybrid_rerank_bge`)
+Current focus: WS4 live CLI smoke (`docintel query` with `ANTHROPIC_API_KEY`) then C4 traces. Do not start L2 / WS5 until cited + abstain + general work against a real index
 
 Publish gates (tick only after personal-machine push + Mac `git fetch`):
 
@@ -55,6 +55,7 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 | 2026-09-04 | Default: nomic-v1.5 or OpenAI text-embedding-3-small + fastembed BM25 + reranker none | challenge wants a workable system and known limits, not max accuracy / slow inference |
 | 2026-09-04 | OpenAI embedder is first-class (`dense_embedder.name: openai` + `OPENAI_API_KEY` in `.env`) | owner may obtain an OpenAI key; same .env convention as LLM keys |
 | 2026-09-04 | WS8 + Docker deferred to write-up next steps | not required; Qdrant embedded covers the demo |
+| 2026-09-05 | Chat ids pinned: haiku-4-5 router/grader/verifier; sonnet-4-6 generation/judge | `init_chat_model("provider:model")`; owner had these in `base.yaml` |
 | 2026-09-03 | LLM via `init_chat_model("provider:model")`, role-based models | provider switch by config + env key only |
 | 2026-09-03 | RAGAS 0.4 and DeepEval both planned behind `BaseGenerationEvaluator`; custom deterministic metrics for L1 | cheap L1 for every ablation; LLM judge (Anthropic) only for finalists |
 | 2026-09-04 | RAGAS faithfulness is the declared headline; DeepEval is a SHOULD cross-check | avoid choosing the metric after seeing results |
@@ -140,23 +141,23 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 - [x] `retrieval_metrics.py` (P@k, R@k any/all, hit@k, MRR, nDCG; per bucket / type). Abstention / general excluded
 - [x] `experiment.py`, `scripts/run_retrieval_eval.py --split dev|test` (per-question checkpoint; test gated by `evals/finalists.txt`), `scripts/make_results_table.py`
 - [x] profiles: exp_dense_only, exp_sparse_only, exp_hybrid_rrf, exp_hybrid_rerank_bge_base, exp_hybrid_rerank_bge (same `index_sig` as nomic ingest). DBSF still MAY
-- [ ] acceptance: dev L1 table rows 1-3 (dense vs sparse vs hybrid RRF) — run on Windows
-- [ ] **C3 PUBLISH**: bundle -> personal push -> Mac fetch. `results/README.md` only; no `per_question.jsonl`.
+- [x] acceptance: dev L1 table rows 1-3 + bge-base + bge-m3 on Windows; same `index_sig` `be217ccb7628`
+- [ ] **C3 PUBLISH**: table is on `origin/main`; tick after treating that push as the C3 gate. `results/README.md` only; no `per_question.jsonl`.
 
 ## WS4: LLM + agentic graph
 
-- [ ] pin exact chat model ids (router/grader/verifier, generation, judge) in `base.yaml`
-- [ ] `llm/factory.py` provider-agnostic, role-based; explicit provider from config; fail-fast on missing key; retry policy; `query_deadline_s`
-- [ ] `llm/structured.py` + shared pydantic schemas
-- [ ] versioned prompts
-- [ ] `agent/state.py`, nodes, edges, `graph.py`, `ChunkCache`
-- [ ] graders: llm_batch, llm_per_chunk, score_threshold
-- [ ] verifiers: llm_claims, nli_cross_encoder, lexical_overlap; citation validation
-- [ ] abstain / general / clarify / refuse nodes
-- [ ] `QueryService.ask()` + query logging + JSONL trace sink + `mlflow.langchain.autolog()` bootstrap
-- [ ] tests: fake-LLM graph; factory provider selection; malformed structured output; API timeout; adversarial-chunk fixture
-- [ ] acceptance: cited answer, abstention, general answer via CLI; provider switch verified for: [ ] anthropic [ ] openai [ ] google_genai (unverified providers marked as such)
-- [ ] saved traces: [ ] success path [ ] abstain path
+- [x] pin exact chat model ids in `base.yaml` (already present): router/grader/verifier `anthropic:claude-haiku-4-5`; generation/judge `anthropic:claude-sonnet-4-6`
+- [x] `llm/factory.py`: `init_chat_model("provider:model")`; key from config only; fail-fast on missing env; retry 429/5xx/timeout with jitter; no retry on 401/403; `query_deadline_s` on nodes
+- [x] `llm/structured.py` + schemas; JSON fence / trailing-comma repair
+- [x] versioned prompts under `llm/prompts/` (`prompt_version` in trace)
+- [x] `agent/state.py`, `nodes.py`, `edges.py`, `graph.py` (LangGraph 1.2 `StateGraph` + `START`/`END`), `ChunkCache`
+- [x] graders: `llm_batch` (default), `llm_per_chunk`, `score_threshold`
+- [x] verifiers: `llm_claims` (default), `nli_cross_encoder`, `lexical_overlap`; citation validation always on
+- [x] abstain / general / clarify / refuse nodes
+- [x] `QueryService.ask()` + in-memory `QueryLog` + JSONL sink + optional `mlflow.langchain.autolog()` (skipped if mlflow missing)
+- [x] tests: fake-LLM graph (cited / abstain / general / refuse / clarify / rewrite cap / first-pass keep); factory missing key + retry + repair; adversarial-chunk fixture; 78 unit+graph tests green
+- [ ] acceptance: cited answer, abstention, general answer via live CLI; provider switch verified for: [ ] anthropic [ ] openai [ ] google_genai (unverified)
+- [x] saved traces: `evals/curated_traces/success.jsonl` [x] `evals/curated_traces/abstain.jsonl` (scripted; replace with live traces before C4)
 - [ ] **C4 PUBLISH**: bundle -> personal push -> Mac fetch. Two curated traces only.
 
 ## WS5: Generation eval (RAGAS + DeepEval) + MLflow + ablations
@@ -224,7 +225,7 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 | # | Question | Answer | Date |
 |---|----------|--------|------|
 | 1 | Corpus size / types | 400 indexed, 50 held out, stratified | 2026-09-03 |
-| 2 | Pinned Anthropic model ids per role | OPEN (haiku class for router/grader/verifier; sonnet class for generation/judge) | |
+| 2 | Pinned Anthropic model ids per role | `claude-haiku-4-5` router/grader/verifier; `claude-sonnet-4-6` generation/judge | 2026-09-05 |
 | 3 | Eval judge provider / frameworks | Same Anthropic key; RAGAS headline, DeepEval cross-check | 2026-09-04 |
 | 4 | Tracing sink | Open source only: JSONL + MLflow autolog; Phoenix optional | 2026-09-03 |
 | 5 | MLflow on/off | On | 2026-09-03 |
@@ -259,3 +260,6 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 | 2026-09-05 | Windows ingest cleanup + embedding API warning: `origin/main` = `5be2905`. 400-doc nomic ingest finished. |
 | 2026-09-05 | WS3 on Mac: Qdrant 1.19 hybrid (`RrfQuery` / DBSF), client RRF/DBSF/weighted, filter_extractor, L1 metrics + checkpointed runner, three exp profiles. LangGraph deferred to WS4. L1 table not yet run. |
 | 2026-09-05 | WS3 review: chunk relevance = any whole gold span (was all; zeroed 31/52 multi-span questions); doc hint matches the company segment only, clause words stop-listed, ambiguous company -> `MatchAny` doc set instead of a title-derived type guess (title vs folder type disagreed 1/18); eval fails loudly on a missing collection; `--scoped` gets its own run dir; split validated; scroll `Record` has no score; fusion provenance is a union. 63 tests. |
+| 2026-09-05 | WS3 L1 table on origin (`523d1cd`): sparse best rank; hybrid+bge-m3 best r@10; bge-base below RRF (slot collapse). |
+| 2026-09-05 | WS4 started on Mac: LangGraph 1.2 StateGraph, `init_chat_model`, QueryService, fake-LLM tests. Live CLI + provider keys still open. 76 tests; mypy on llm/agent/service/core green. |
+| 2026-09-05 | WS4 review: router `doc_hint`/`agreement_type` no longer become Qdrant payload filters (unknown key = zero hits = forced abstain); rewrite keeps first-pass candidates; 1 relevant chunk after the rewrite cap answers instead of abstaining; `structured()` falls back to raw+repair only on parse errors (API errors retry, not double-call); mlflow autolog imports `mlflow.langchain`; CLI catches `MissingSecretError` at container build. 78 tests. |

@@ -94,8 +94,8 @@ def build_retrieval_pipeline(
     unknown = set(ret.query_transforms) - _KNOWN_TRANSFORMS
     if unknown:
         raise ValueError(f"unknown query_transforms {sorted(unknown)}")
-    # filter_extractor always runs (gated by retrieval.filters). multi_query / hyde need
-    # the WS4 LLM factory and are identity until then.
+    # filter_extractor always runs inside RetrievalPipeline. multi_query / hyde stay
+    # identity unless listed; rewrite lives in the WS4 graph, not here.
     transforms: list[IdentityTransform] = []
     return RetrievalPipeline(
         config,

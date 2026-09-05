@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import os
 import tempfile
 
 from docintel.config import AppConfig, config_hash, index_sig
@@ -49,7 +50,10 @@ def run_doctor(config: AppConfig) -> tuple[list[str], int]:
     if not embed_ok:
         failed += 1
 
-    lines.append(_skip("llm", "WS4 chat / structured-output preflight"))
+    llm_line, llm_ok = _llm_check(config)
+    lines.append(llm_line)
+    if not llm_ok:
+        failed += 1
     return lines, failed
 
 
@@ -118,6 +122,18 @@ def _embedder_check(config: AppConfig) -> tuple[str, bool]:
         return _skip(name, f"{exc.env_var} not set"), True
     except Exception as exc:
         return _fail(name, str(exc)), False
+
+
+def _llm_check(config: AppConfig) -> tuple[str, bool]:
+    from docintel.llm.factory import export_provider_keys, required_env_vars
+
+    export_provider_keys()
+    missing = [name for name in required_env_vars(config) if not os.environ.get(name)]
+    provider = config.llm.default_provider
+    roles = ",".join(f"{k}={v.model}" for k, v in config.llm.roles.items())
+    if missing:
+        return _skip("llm", f"{missing[0]} not set; provider={provider}"), True
+    return _ok("llm", f"provider={provider} {roles}"), True
 
 
 def _score_pair(

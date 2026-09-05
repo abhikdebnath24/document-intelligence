@@ -1,0 +1,8 @@
+{"node": "classify_query", "t_ms": 0.0, "outputs_summary": {"prompt_version": "classify-v1"}}
+{"node": "plan_retrieval", "t_ms": 0.0, "outputs_summary": {}}
+{"node": "retrieve_hybrid", "t_ms": 0.0, "outputs_summary": {"n": 2}}
+{"node": "rerank", "t_ms": 0.0, "outputs_summary": {"n": 2}}
+{"node": "grade_documents", "t_ms": 0.0, "outputs_summary": {"n_relevant": 1}}
+{"node": "generate", "t_ms": 0.0, "outputs_summary": {"prompt_version": "generate-v1", "n_cites": 1}}
+{"node": "verify_groundedness", "t_ms": 0.0, "outputs_summary": {"grounded": true}}
+{"node": "finalize", "t_ms": 0.0, "outputs_summary": {}}
