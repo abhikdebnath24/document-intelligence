@@ -130,9 +130,11 @@ class InProcessClient:
             closer()
 
 
-def run_pdf_ingest(client: RagClient, raw: bytes) -> dict[str, object]:
+def run_pdf_ingest(
+    client: RagClient, raw: bytes, *, filename: str | None = None
+) -> dict[str, object]:
     t0 = time.perf_counter()
-    path = save_upload(raw, client.repo_root / "data" / "uploads")
+    path = save_upload(raw, client.repo_root / "data" / "uploads", filename=filename)
     report = client.ingest_paths([path])
     elapsed = time.perf_counter() - t0
     if report.failed:

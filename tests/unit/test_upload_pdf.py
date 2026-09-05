@@ -34,3 +34,20 @@ def test_save_upload_writes_uuid_pdf(tmp_path: Path) -> None:
     assert path.parent == dest
     assert path.suffix == ".pdf"
     assert path.stem != "src"
+
+
+def test_save_upload_keeps_safe_stem(tmp_path: Path) -> None:
+    import pymupdf
+
+    src = tmp_path / "src.pdf"
+    doc = pymupdf.open()  # type: ignore[no-untyped-call]
+    doc.new_page()
+    doc.save(src)
+    doc.close()
+    dest = tmp_path / "uploads"
+    path = save_upload(
+        src.read_bytes(),
+        dest,
+        filename="SECURIAN FUNDS MAINTENANCE AGREEMENT.PDF",
+    )
+    assert path.stem.lower().startswith("securian funds maintenance agreement__")

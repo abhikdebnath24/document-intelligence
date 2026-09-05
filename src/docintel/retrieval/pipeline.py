@@ -8,6 +8,16 @@ from docintel.core.types import RetrievalQuery, RetrievedChunk
 from docintel.retrieval.transforms import FilterExtractor
 
 
+def _with_unknown_type(filters: dict) -> dict:
+    """Uploads are agreement_type=Unknown. A hard type must would drop them."""
+    at = filters.get("agreement_type")
+    if isinstance(at, str):
+        return {**filters, "agreement_type": [at, "Unknown"]}
+    if isinstance(at, list) and "Unknown" not in at:
+        return {**filters, "agreement_type": [*at, "Unknown"]}
+    return filters
+
+
 class RetrievalPipeline:
     def __init__(
         self,
@@ -17,6 +27,7 @@ class RetrievalPipeline:
         reranker: BaseReranker,
         transforms: Sequence[BaseQueryTransform],
         extractor: FilterExtractor,
+        upload_ids: Sequence[str] | None = None,
     ) -> None:
         self.config = config
         self.retriever = retriever
@@ -24,6 +35,7 @@ class RetrievalPipeline:
         self.reranker = reranker
         self.transforms = list(transforms)
         self.extractor = extractor
+        self.upload_ids = [i for i in (upload_ids or []) if i]
 
     def search(self, query: RetrievalQuery) -> list[RetrievedChunk]:
         """Fuse candidates. Rerank is a separate graph node / retrieve() step."""
@@ -33,7 +45,7 @@ class RetrievalPipeline:
             use_agreement_type=flags.use_agreement_type,
             use_doc_hint=flags.use_doc_hint,
         )
-        filters = {**extracted, **query.filters}
+        filters = _with_unknown_type({**extracted, **query.filters})
         texts = [query.text]
         for transform in self.transforms:
             texts = [t for src in texts for t in transform.transform(src)]
@@ -46,6 +58,18 @@ class RetrievalPipeline:
                     RetrievalQuery(text=text, k=retrieve_k, filters=filters, doc_id=query.doc_id)
                 )
             )
+            # UI uploads sit outside the 400-doc catalog. A type/doc filter or a
+            # top-k drown would hide them; pull those doc_ids unfiltered and fuse.
+            if self.upload_ids:
+                extra = self.retriever.retrieve(
+                    RetrievalQuery(
+                        text=text,
+                        k=retrieve_k,
+                        filters={"doc_id": list(self.upload_ids)},
+                    )
+                )
+                if extra:
+                    lists.append(extra)
         return lists[0] if len(lists) == 1 else self.fusion.fuse(lists)
 
     def retrieve(self, query: RetrievalQuery) -> list[RetrievedChunk]:

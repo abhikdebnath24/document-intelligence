@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import uuid
 from pathlib import Path
 
@@ -11,21 +12,33 @@ from docintel.ingestion.pipeline import IngestReport
 PDF_MAGIC = b"%PDF"
 MAX_UPLOAD_BYTES = 25 * 1024 * 1024
 MAX_UPLOAD_PAGES = 300
+_STEM_UNSAFE = re.compile(r"[^\w.\- ]+", re.ASCII)
 
 
 class UploadError(ValueError):
     pass
 
 
-def save_upload(raw: bytes, dest_dir: Path) -> Path:
-    """Ignore the client filename. uuid path, magic bytes, size/page caps."""
+def _safe_stem(filename: str | None) -> str:
+    if not filename:
+        return ""
+    stem = Path(filename).name
+    stem = Path(stem).stem
+    stem = _STEM_UNSAFE.sub("", stem)[:120].strip(" ._")
+    return stem
+
+
+def save_upload(raw: bytes, dest_dir: Path, *, filename: str | None = None) -> Path:
+    """uuid path, optional original stem prefix, magic bytes, size/page caps."""
     # PDF 1.7 spec 7.5.2: the header may sit anywhere in the first 1024 bytes.
     if PDF_MAGIC not in raw[:1024]:
         raise UploadError("file is not a PDF (missing %PDF header)")
     if len(raw) > MAX_UPLOAD_BYTES:
         raise UploadError(f"PDF exceeds {MAX_UPLOAD_BYTES // (1024 * 1024)} MB")
     dest_dir.mkdir(parents=True, exist_ok=True)
-    path = dest_dir / f"{uuid.uuid4()}.pdf"
+    stem = _safe_stem(filename)
+    name = f"{stem}__{uuid.uuid4()}" if stem else str(uuid.uuid4())
+    path = dest_dir / f"{name}.pdf"
     path.write_bytes(raw)
     try:
         import pymupdf

@@ -225,7 +225,9 @@ def _upload_block(client: RagClient) -> None:
         return
     with st.spinner("Loading, chunking, embedding, upserting...", show_time=True):
         try:
-            st.session_state.last_ingest = run_pdf_ingest(client, uploaded.getvalue())
+            st.session_state.last_ingest = run_pdf_ingest(
+                client, uploaded.getvalue(), filename=uploaded.name
+            )
             st.session_state._ingest_token = token
         except UploadError as exc:
             st.session_state.ingest_error = str(exc)

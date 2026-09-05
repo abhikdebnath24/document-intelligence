@@ -28,11 +28,19 @@ def doc_id_for(path: Path) -> str:
     return normalize_stem(path.stem)
 
 
+def is_upload_path(source_path: str | Path) -> bool:
+    norm = str(source_path).replace("\\", "/")
+    return "/uploads/" in norm
+
+
 def agreement_type_for(path: Path) -> str:
     try:
         return agreement_type_from_folder(path.parent.name)
     except ValueError:
-        return "Unknown"
+        from docintel.retrieval.transforms import _agreement_type
+
+        blob = path.name.lower().replace("_", " ").replace("-", " ")
+        return _agreement_type(blob) or "Unknown"
 
 
 def _norm_ratio_text(text: str) -> str:
