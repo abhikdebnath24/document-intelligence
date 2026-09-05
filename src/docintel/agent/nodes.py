@@ -266,6 +266,7 @@ def _citations(draft: GenerateOut, cache: Any) -> list[Citation]:
                 chunk_id=item.chunk_id,
                 doc_id=row.chunk.doc_id,
                 page_no=row.chunk.page_start,
+                page_end=row.chunk.page_end,
                 bboxes=list(row.chunk.bboxes),
                 quote=item.quote,
             )

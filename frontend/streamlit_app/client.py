@@ -104,7 +104,8 @@ class InProcessClient:
     def ingest_paths(self, paths: list[Path]) -> IngestReport:
         # One embedded Qdrant lock: drop the query store before ingest writes.
         if self._query is not None:
-            self._query.container.pipeline.close()
+            self._query.close()
+            self._query = None
         return self.ingest.ingest_paths(paths)
 
     def find_source(self, doc_id: str) -> Path | None:

@@ -66,6 +66,7 @@ class Citation(BaseModel):
     chunk_id: str
     doc_id: str
     page_no: int
+    page_end: int = 0
     bboxes: list[BBox] = Field(default_factory=list)
     quote: str
 

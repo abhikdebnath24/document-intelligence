@@ -17,7 +17,7 @@ from docintel.feedback.analytics import (
 from docintel.feedback.models import FEEDBACK_TAGS
 from docintel.feedback.repository import SqlAlchemyFeedbackRepository
 from docintel.service.ingest_service import UploadError, save_upload
-from docintel.service.pdf_render import render_cited_page
+from docintel.service.pdf_render import highlight_boxes, render_cited_page
 
 NOTICE = (
     "With an Anthropic / OpenAI / Google key set, questions, answers, and retrieved "
@@ -164,8 +164,10 @@ def _pdf_panel(client: RagClient, cite: Citation) -> None:
         st.warning("PDF not on disk. Quote fallback:")
         st.write(cite.quote)
         return
-    if not cite.bboxes:
-        st.caption(f"{path.name} p.{cite.page_no} (no bboxes; quote only)")
+    boxes = highlight_boxes(cite)
+    if not boxes:
+        reason = "multi-page chunk" if (cite.page_end or cite.page_no) != cite.page_no else "no bboxes"
+        st.caption(f"{path.name} p.{cite.page_no} ({reason}; quote only)")
         st.write(cite.quote)
         return
     png = render_cited_page(path, cite, dpi=client.config.frontend.pdf_render_dpi)

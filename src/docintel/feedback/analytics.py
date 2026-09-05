@@ -138,6 +138,6 @@ def _summary(name: str, ratings: list[int]) -> dict[str, Any]:
         "key": name,
         "n": len(ratings),
         "mean_rating": (sum(ratings) / len(ratings)) if ratings else 0.0,
-        "up": sum(1 for r in ratings if r > 0),
-        "down": sum(1 for r in ratings if r < 0),
+        "up": sum(1 for r in ratings if r >= 4),
+        "down": sum(1 for r in ratings if r <= 2),
     }

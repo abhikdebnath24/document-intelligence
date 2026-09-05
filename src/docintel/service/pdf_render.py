@@ -13,6 +13,14 @@ def resolve_pdf_path(source_path: str, repo_root: Path) -> Path | None:
     return None
 
 
+def highlight_boxes(citation: Citation) -> list[BBox]:
+    """BBoxes have no page id. Skip draw when the chunk spans pages."""
+    end = citation.page_end or citation.page_no
+    if end != citation.page_no:
+        return []
+    return list(citation.bboxes)
+
+
 def render_cited_page(pdf_path: Path, citation: Citation, *, dpi: int = 120) -> bytes:
     import pymupdf
 
@@ -22,8 +30,7 @@ def render_cited_page(pdf_path: Path, citation: Citation, *, dpi: int = 120) -> 
         if idx >= pdf.page_count:
             idx = 0
         page = pdf.load_page(idx)  # type: ignore[no-untyped-call]
-        boxes = citation.bboxes or []
-        for box in boxes:
+        for box in highlight_boxes(citation):
             _highlight(page, box)
         png: bytes = page.get_pixmap(dpi=dpi).tobytes("png")
         return png

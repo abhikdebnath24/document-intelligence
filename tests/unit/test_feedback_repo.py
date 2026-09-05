@@ -6,6 +6,7 @@ import pytest
 
 from docintel.core.types import DocumentRecord, QueryLog
 from docintel.feedback.analytics import (
+    _summary,
     export_csv,
     ratings_by_agreement_type,
     ratings_by_config_hash,
@@ -116,7 +117,7 @@ def test_analytics_and_csv(tmp_path: Path) -> None:
     )
     svc.rate("q1", -1, tags=["wrong_answer"])
     svc.rate("q1", -1, tags=["hallucination"])
-    svc.rate("q2", 1, tags=["good"])
+    svc.rate("q2", 5, tags=["good"])
 
     by_route = {row["key"]: row for row in ratings_by_route(repo)}
     assert by_route["corpus_technical"]["n"] == 2
@@ -138,3 +139,9 @@ def test_analytics_and_csv(tmp_path: Path) -> None:
     assert "wrong_answer" in text
     assert "License" in text
     repo.close()
+
+
+def test_summary_likert_buckets() -> None:
+    row = _summary("x", [-1, 1, 2, 3, 4, 5])
+    assert row["up"] == 2
+    assert row["down"] == 3
