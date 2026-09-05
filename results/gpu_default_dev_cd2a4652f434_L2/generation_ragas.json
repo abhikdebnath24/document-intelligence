@@ -1,0 +1,262 @@
+{
+  "framework": "ragas",
+  "overall": {
+    "faithfulness": 0.6362155388471178,
+    "context_precision_with_reference": 0.6904761904198412,
+    "context_recall": 0.7,
+    "noise_sensitivity": 0.16491228070175437
+  },
+  "per_sample": [
+    {
+      "id": "q_001"
+    },
+    {
+      "id": "q_002"
+    },
+    {
+      "id": "q_003",
+      "faithfulness": 0.6666666666666666,
+      "context_precision_with_reference": 0.9999999999,
+      "context_recall": 1.0,
+      "noise_sensitivity": 0.0
+    },
+    {
+      "id": "q_004",
+      "faithfulness": 1.0,
+      "context_precision_with_reference": 0.9999999999,
+      "context_recall": 1.0,
+      "noise_sensitivity": 1.0
+    },
+    {
+      "id": "q_005",
+      "skipped": true
+    },
+    {
+      "id": "q_006",
+      "faithfulness": 0.3333333333333333,
+      "context_precision_with_reference": 0.0,
+      "context_recall": 0.0,
+      "noise_sensitivity": 0.0
+    },
+    {
+      "id": "q_007",
+      "skipped": true
+    },
+    {
+      "id": "q_008",
+      "faithfulness": 0.5714285714285714,
+      "context_precision_with_reference": 0.9999999999,
+      "context_recall": 1.0,
+      "noise_sensitivity": 0.0
+    },
+    {
+      "id": "q_009",
+      "faithfulness": 1.0,
+      "context_precision_with_reference": 0.9999999999,
+      "context_recall": 1.0,
+      "noise_sensitivity": 0.8333333333333334
+    },
+    {
+      "id": "q_010",
+      "skipped": true
+    },
+    {
+      "id": "q_011",
+      "skipped": true
+    },
+    {
+      "id": "q_012",
+      "skipped": true
+    },
+    {
+      "id": "q_013",
+      "faithfulness": 0.16666666666666666,
+      "context_precision_with_reference": 0.0,
+      "context_recall": 0.0,
+      "noise_sensitivity": 0.0
+    },
+    {
+      "id": "q_014",
+      "skipped": true
+    },
+    {
+      "id": "q_015",
+      "skipped": true
+    },
+    {
+      "id": "q_016",
+      "faithfulness": 0.16666666666666666,
+      "context_precision_with_reference": 0.0,
+      "context_recall": 1.0,
+      "noise_sensitivity": 0.0
+    },
+    {
+      "id": "q_017",
+      "skipped": true
+    },
+    {
+      "id": "q_018",
+      "skipped": true
+    },
+    {
+      "id": "q_019",
+      "skipped": true
+    },
+    {
+      "id": "q_020",
+      "faithfulness": 1.0,
+      "context_precision_with_reference": 0.9999999999,
+      "context_recall": 1.0,
+      "noise_sensitivity": 0.0
+    },
+    {
+      "id": "q_021",
+      "faithfulness": 1.0,
+      "context_precision_with_reference": 0.9999999999,
+      "context_recall": 1.0,
+      "noise_sensitivity": 0.7
+    },
+    {
+      "id": "q_022",
+      "faithfulness": 1.0,
+      "context_precision_with_reference": 0.9999999999666667,
+      "context_recall": 1.0,
+      "noise_sensitivity": 0.6
+    },
+    {
+      "id": "q_023",
+      "faithfulness": 0.6,
+      "context_precision_with_reference": 0.9999999999,
+      "context_recall": 1.0,
+      "noise_sensitivity": 0.0
+    },
+    {
+      "id": "q_024",
+      "skipped": true
+    },
+    {
+      "id": "q_025",
+      "skipped": true
+    },
+    {
+      "id": "q_026",
+      "faithfulness": 0.3333333333333333,
+      "context_precision_with_reference": 0.49999999995,
+      "context_recall": 0.0,
+      "noise_sensitivity": 0.0
+    },
+    {
+      "id": "q_027",
+      "skipped": true
+    },
+    {
+      "id": "q_028",
+      "faithfulness": 0.75,
+      "context_precision_with_reference": 0.9999999999,
+      "context_recall": 1.0,
+      "noise_sensitivity": 0.0
+    },
+    {
+      "id": "q_029",
+      "context_precision_with_reference": 0.99999999995,
+      "context_recall": 1.0
+    },
+    {
+      "id": "q_030",
+      "faithfulness": 1.0,
+      "context_precision_with_reference": 0.0,
+      "context_recall": 0.0,
+      "noise_sensitivity": 0.0
+    },
+    {
+      "id": "q_031",
+      "faithfulness": 0.0,
+      "context_precision_with_reference": 0.99999999995,
+      "context_recall": 1.0,
+      "noise_sensitivity": 0.0
+    },
+    {
+      "id": "q_032",
+      "faithfulness": 0.6,
+      "context_precision_with_reference": 0.99999999995,
+      "context_recall": 1.0,
+      "noise_sensitivity": 0.0
+    },
+    {
+      "id": "q_033",
+      "faithfulness": 0.4,
+      "context_precision_with_reference": 0.9999999999,
+      "context_recall": 1.0,
+      "noise_sensitivity": 0.0
+    },
+    {
+      "id": "q_034",
+      "faithfulness": 0.9,
+      "context_precision_with_reference": 0.0,
+      "context_recall": 0.0,
+      "noise_sensitivity": 0.0
+    },
+    {
+      "id": "q_035",
+      "faithfulness": 0.6,
+      "context_precision_with_reference": 0.0,
+      "context_recall": 0.0,
+      "noise_sensitivity": 0.0
+    },
+    {
+      "id": "q_036",
+      "context_precision_with_reference": 0.99999999995
+    },
+    {
+      "id": "q_037",
+      "skipped": true
+    },
+    {
+      "id": "q_038",
+      "skipped": true
+    },
+    {
+      "id": "q_039",
+      "skipped": true
+    },
+    {
+      "id": "q_040",
+      "skipped": true
+    }
+  ],
+  "skipped_ids": [
+    "q_005",
+    "q_007",
+    "q_010",
+    "q_011",
+    "q_012",
+    "q_014",
+    "q_015",
+    "q_017",
+    "q_018",
+    "q_019",
+    "q_024",
+    "q_025",
+    "q_027",
+    "q_037",
+    "q_038",
+    "q_039",
+    "q_040"
+  ],
+  "notes": [
+    "q_001:faithfulness:missing_input",
+    "q_001:context_precision_with_reference:missing_input",
+    "q_001:context_recall:missing_input",
+    "q_001:noise_sensitivity:missing_input",
+    "q_002:faithfulness:missing_input",
+    "q_002:context_precision_with_reference:missing_input",
+    "q_002:context_recall:missing_input",
+    "q_002:noise_sensitivity:missing_input",
+    "q_029:faithfulness:IncompleteOutputException",
+    "q_029:noise_sensitivity:IncompleteOutputException",
+    "q_036:faithfulness:IncompleteOutputException",
+    "q_036:context_recall:IncompleteOutputException",
+    "q_036:noise_sensitivity:IncompleteOutputException",
+    "abstain rows excluded from RAGAS averages"
+  ]
+}

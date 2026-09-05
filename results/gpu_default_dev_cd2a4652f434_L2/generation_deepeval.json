@@ -1,0 +1,310 @@
+{
+  "framework": "deepeval",
+  "overall": {
+    "faithfulness": 0.9663059163059163,
+    "answer_relevancy": 0.967391304347826,
+    "contextual_precision": 0.8571428571428571,
+    "contextual_recall": 0.9523809523809523,
+    "contextual_relevancy": 0.35665680650152704,
+    "geval_clause_citation": 0.9476190476190476
+  },
+  "per_sample": [
+    {
+      "id": "q_001",
+      "answer_relevancy": 1.0
+    },
+    {
+      "id": "q_002",
+      "answer_relevancy": 1.0
+    },
+    {
+      "id": "q_003",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.75,
+      "geval_clause_citation": 1.0
+    },
+    {
+      "id": "q_004",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.5,
+      "geval_clause_citation": 1.0
+    },
+    {
+      "id": "q_005",
+      "skipped": true
+    },
+    {
+      "id": "q_006",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.09090909090909091,
+      "geval_clause_citation": 0.9
+    },
+    {
+      "id": "q_007",
+      "skipped": true
+    },
+    {
+      "id": "q_008",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.4,
+      "geval_clause_citation": 0.9
+    },
+    {
+      "id": "q_009",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.3333333333333333,
+      "geval_clause_citation": 1.0
+    },
+    {
+      "id": "q_010",
+      "skipped": true
+    },
+    {
+      "id": "q_011",
+      "skipped": true
+    },
+    {
+      "id": "q_012",
+      "skipped": true
+    },
+    {
+      "id": "q_013",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 0.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.0,
+      "geval_clause_citation": 0.9
+    },
+    {
+      "id": "q_014",
+      "skipped": true
+    },
+    {
+      "id": "q_015",
+      "skipped": true
+    },
+    {
+      "id": "q_016",
+      "faithfulness": 0.8333333333333334,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.0,
+      "geval_clause_citation": 0.9
+    },
+    {
+      "id": "q_017",
+      "skipped": true
+    },
+    {
+      "id": "q_018",
+      "skipped": true
+    },
+    {
+      "id": "q_019",
+      "skipped": true
+    },
+    {
+      "id": "q_020",
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.75,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.2857142857142857,
+      "geval_clause_citation": 1.0
+    },
+    {
+      "id": "q_021",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.4444444444444444,
+      "geval_clause_citation": 1.0
+    },
+    {
+      "id": "q_022",
+      "faithfulness": 0.75,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.30434782608695654,
+      "geval_clause_citation": 1.0
+    },
+    {
+      "id": "q_023",
+      "faithfulness": 0.8,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.8,
+      "geval_clause_citation": 0.9
+    },
+    {
+      "id": "q_024",
+      "skipped": true
+    },
+    {
+      "id": "q_025",
+      "skipped": true
+    },
+    {
+      "id": "q_026",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 0.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.3333333333333333,
+      "geval_clause_citation": 0.9
+    },
+    {
+      "id": "q_027",
+      "skipped": true
+    },
+    {
+      "id": "q_028",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.5714285714285714,
+      "geval_clause_citation": 1.0
+    },
+    {
+      "id": "q_029",
+      "faithfulness": 0.9090909090909091,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.9230769230769231,
+      "geval_clause_citation": 1.0
+    },
+    {
+      "id": "q_030",
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.5,
+      "contextual_precision": 0.0,
+      "contextual_recall": 0.0,
+      "contextual_relevancy": 0.0,
+      "geval_clause_citation": 0.9
+    },
+    {
+      "id": "q_031",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.16666666666666666,
+      "geval_clause_citation": 0.9
+    },
+    {
+      "id": "q_032",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.375,
+      "geval_clause_citation": 0.9
+    },
+    {
+      "id": "q_033",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.25,
+      "geval_clause_citation": 1.0
+    },
+    {
+      "id": "q_034",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.0,
+      "geval_clause_citation": 0.9
+    },
+    {
+      "id": "q_035",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.0,
+      "geval_clause_citation": 0.9
+    },
+    {
+      "id": "q_036",
+      "faithfulness": 1.0,
+      "answer_relevancy": 1.0,
+      "contextual_precision": 1.0,
+      "contextual_recall": 1.0,
+      "contextual_relevancy": 0.9615384615384616,
+      "geval_clause_citation": 1.0
+    },
+    {
+      "id": "q_037",
+      "skipped": true
+    },
+    {
+      "id": "q_038",
+      "skipped": true
+    },
+    {
+      "id": "q_039",
+      "skipped": true
+    },
+    {
+      "id": "q_040",
+      "skipped": true
+    }
+  ],
+  "skipped_ids": [
+    "q_005",
+    "q_007",
+    "q_010",
+    "q_011",
+    "q_012",
+    "q_014",
+    "q_015",
+    "q_017",
+    "q_018",
+    "q_019",
+    "q_024",
+    "q_025",
+    "q_027",
+    "q_037",
+    "q_038",
+    "q_039",
+    "q_040"
+  ],
+  "notes": [
+    "q_001:faithfulness:missing_input",
+    "q_001:contextual_precision:missing_input",
+    "q_001:contextual_recall:missing_input",
+    "q_001:contextual_relevancy:missing_input",
+    "q_001:geval_clause_citation:missing_input",
+    "q_002:faithfulness:missing_input",
+    "q_002:contextual_precision:missing_input",
+    "q_002:contextual_recall:missing_input",
+    "q_002:contextual_relevancy:missing_input",
+    "q_002:geval_clause_citation:missing_input",
+    "abstain rows excluded from DeepEval averages"
+  ]
+}

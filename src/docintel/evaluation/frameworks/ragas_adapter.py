@@ -139,6 +139,12 @@ def _build_metrics(config: AppConfig) -> dict[str, Any]:
     llm = llm_factory(
         model_name, provider=_RAGAS_PROVIDER[provider], client=_async_client(provider)
     )
+    if provider == "anthropic":
+        # RAGAS 0.4.3's InstructorLLM supplies these sampling parameters by
+        # default, but anthropic>=1.0 removed them from messages.create().
+        # Keep max_tokens (the supported output-length control) unchanged.
+        llm.model_args.pop("temperature", None)
+        llm.model_args.pop("top_p", None)
     wanted = set(config.evaluation.ragas.metrics)
     catalog: dict[str, Any] = {
         "faithfulness": Faithfulness(llm=llm),

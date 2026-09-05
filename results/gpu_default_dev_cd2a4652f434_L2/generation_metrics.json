@@ -1,0 +1,29 @@
+{
+  "profile": "gpu_default",
+  "split": "dev",
+  "layer": "L2",
+  "config_hash": "cd2a4652f4340eb4e0daa78d6b904c80a2e77a524fcd79b799389a283c893e93",
+  "index_sig": "be217ccb7628d9b7d6097f4a0a52b96594ef470faf33a4b021dd2fa99d5a9f30",
+  "qa_sha": "a45f4c51835deac0c8dc1ae35a957567ef1974ed7e3b27077b5e57dec1b5de1c",
+  "git_sha": "1da485aae8ca59c62aa388e9f5ae7aaee931b06c",
+  "n": 40,
+  "custom": {
+    "n": 40.0,
+    "route_accuracy": 1.0,
+    "abstention_precision": 0.4,
+    "abstention_recall": 0.75,
+    "citation_validity": 1.0,
+    "mean_groundedness": 0.6052631578947368,
+    "latency_p50_ms": 48078.0,
+    "latency_p95_ms": 67375.0,
+    "llm_calls_per_query": 6.5
+  },
+  "ragas": {
+    "faithfulness": 0.6362155388471178,
+    "context_precision_with_reference": 0.6904761904198412,
+    "context_recall": 0.7,
+    "noise_sensitivity": 0.16491228070175437
+  },
+  "deepeval": {},
+  "mlflow_run_id": "041d6430f09847a39374562f54933796"
+}

@@ -5,7 +5,7 @@ index_sig=be217ccb7628d9b7d6097f4a0a52b96594ef470faf33a4b021dd2fa99d5a9f30
 qa_sha=a45f4c51835deac0c8dc1ae35a957567ef1974ed7e3b27077b5e57dec1b5de1c
 n=40
 
-faithfulness_ragas=n/a
+faithfulness_ragas=0.6362155388471178
 route_accuracy=1.0
 abstention_recall=0.75
 latency_p50_ms=48078.0
