@@ -24,6 +24,13 @@
     "context_recall": 0.7,
     "noise_sensitivity": 0.16491228070175437
   },
-  "deepeval": {},
+  "deepeval": {
+    "faithfulness": 0.9663059163059163,
+    "answer_relevancy": 0.967391304347826,
+    "contextual_precision": 0.8571428571428571,
+    "contextual_recall": 0.9523809523809523,
+    "contextual_relevancy": 0.35665680650152704,
+    "geval_clause_citation": 0.9476190476190476
+  },
   "mlflow_run_id": "041d6430f09847a39374562f54933796"
 }

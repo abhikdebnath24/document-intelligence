@@ -12,12 +12,13 @@ COLS = ("hit@5", "r@5", "r@10", "p@5", "ndcg@10", "mrr")
 def main() -> int:
     root = find_repo_root(ROOT)
     results = root / "results"
-    rows: list[dict[str, object]] = []
+    l1_rows: list[dict[str, object]] = []
+    l2_rows: list[dict[str, object]] = []
     if results.is_dir():
         for path in sorted(results.glob("*/retrieval_metrics.json")):
             payload = json.loads(path.read_text(encoding="utf-8"))
             overall = payload.get("overall") or {}
-            rows.append(
+            l1_rows.append(
                 {
                     "profile": payload.get("profile"),
                     "split": payload.get("split"),
@@ -29,6 +30,45 @@ def main() -> int:
                     "path": str(path.relative_to(root)),
                 }
             )
+        for path in sorted(results.glob("*/generation_metrics.json")):
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            custom = payload.get("custom") or {}
+            ragas = payload.get("ragas") or {}
+            deepeval_p = path.parent / "generation_deepeval.json"
+            de = (
+                json.loads(deepeval_p.read_text(encoding="utf-8"))
+                if deepeval_p.is_file()
+                else {}
+            )
+            de_overall = de.get("overall") or {}
+            p50_ms = custom.get("latency_p50_ms")
+            p50_s = f"{p50_ms / 1000.0:.1f}s" if isinstance(p50_ms, (int, float)) else ""
+            abstain_p = custom.get("abstention_precision")
+            abstain_r = custom.get("abstention_recall")
+            abstain_str = (
+                f"{_fmt(abstain_p)} / {_fmt(abstain_r)}"
+                if abstain_p is not None or abstain_r is not None
+                else ""
+            )
+            l2_rows.append(
+                {
+                    "profile": payload.get("profile"),
+                    "split": payload.get("split"),
+                    "n": int(payload.get("n") or custom.get("n") or 0),
+                    "faithfulness_ragas": ragas.get("faithfulness"),
+                    "groundedness": custom.get("mean_groundedness"),
+                    "route_accuracy": custom.get("route_accuracy"),
+                    "citation_validity": custom.get("citation_validity"),
+                    "abstain": abstain_str,
+                    "latency_p50": p50_s,
+                    "faithfulness_deepeval": de_overall.get("faithfulness"),
+                    "config_hash": str(payload.get("config_hash") or "")[:12],
+                    "index_sig": str(payload.get("index_sig") or "")[:12],
+                    "git_sha": str(payload.get("git_sha") or "")[:8],
+                    "path": str(path.relative_to(root)),
+                }
+            )
+
     out = root / "results" / "README.md"
     out.parent.mkdir(parents=True, exist_ok=True)
     lines = [
@@ -39,7 +79,7 @@ def main() -> int:
         "| profile | split | n | hit@5 | r@5 | r@10 | p@5 | ndcg@10 | mrr | hashes |",
         "|---|---|---:|---:|---:|---:|---:|---:|---:|---|",
     ]
-    if not rows:
+    if not l1_rows:
         lines.append("| _none yet_ |  |  |  |  |  |  |  |  |  |")
         lines.append("")
         lines.append("Windows, after the nomic index exists:")
@@ -54,7 +94,7 @@ def main() -> int:
         lines.append("uv run python scripts/make_results_table.py")
         lines.append("```")
     else:
-        for row in rows:
+        for row in l1_rows:
             hashes = f"{row['config_hash']} / {row['index_sig']} / {row['git_sha']}"
             cells = [
                 str(row["profile"]),
@@ -64,6 +104,45 @@ def main() -> int:
                 hashes,
             ]
             lines.append("| " + " | ".join(cells) + " |")
+
+    lines.extend([
+        "",
+        "---",
+        "",
+        "# Generation L2",
+        "",
+        (
+            "| profile | split | n | RAGAS faith | groundedness | route acc | "
+            "cite valid | abstain P/R | latency p50 | DeepEval faith | hashes |"
+        ),
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|",
+    ])
+    if not l2_rows:
+        lines.append("| _none yet_ |  |  |  |  |  |  |  |  |  |  |")
+        lines.append("")
+        lines.append("To run L2 evaluation on Windows:")
+        lines.append("```")
+        lines.append("uv run docintel eval --layer L2 --split dev --profile gpu_default")
+        lines.append("uv run python scripts/make_results_table.py")
+        lines.append("```")
+    else:
+        for row in l2_rows:
+            hashes = f"{row['config_hash']} / {row['index_sig']} / {row['git_sha']}"
+            cells = [
+                str(row["profile"]),
+                str(row["split"]),
+                str(row["n"]),
+                _fmt(row.get("faithfulness_ragas")),
+                _fmt(row.get("groundedness")),
+                _fmt(row.get("route_accuracy")),
+                _fmt(row.get("citation_validity")),
+                str(row.get("abstain") or ""),
+                str(row.get("latency_p50") or ""),
+                _fmt(row.get("faithfulness_deepeval")),
+                hashes,
+            ]
+            lines.append("| " + " | ".join(cells) + " |")
+
     lines.append("")
     out.write_text("\n".join(lines), encoding="utf-8")
     print(out)

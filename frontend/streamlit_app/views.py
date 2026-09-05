@@ -238,39 +238,123 @@ def experiments_page(client: RagClient) -> None:
     if not runs:
         st.info("No results/ folders yet.")
         return
-    names = [p.name for p in runs]
-    picked = st.multiselect("Compare runs", names, default=names[: min(3, len(names))])
-    table: list[dict[str, object]] = []
-    for name in picked:
-        folder = root / name
-        l1 = folder / "retrieval_metrics.json"
-        l2 = folder / "generation_metrics.json"
-        row: dict[str, object] = {"run": name}
-        if l1.is_file():
-            payload = json.loads(l1.read_text())
-            overall = payload.get("overall") or {}
-            row.update(
+
+    l1_runs = [p.name for p in runs if (root / p / "retrieval_metrics.json").is_file()]
+    l2_runs = [p.name for p in runs if (root / p / "generation_metrics.json").is_file()]
+
+    st.divider()
+    st.subheader("Interactive Run Inspector")
+
+    def _round3(val: object) -> float | None:
+        return round(val, 3) if isinstance(val, float) else None
+
+    if l2_runs:
+        st.markdown("### L2 Generation Runs")
+        picked_l2 = st.multiselect("Select L2 runs to compare", l2_runs, default=l2_runs)
+        l2_table: list[dict[str, object]] = []
+        for name in picked_l2:
+            folder = root / name
+            payload = json.loads((folder / "generation_metrics.json").read_text(encoding="utf-8"))
+            custom = payload.get("custom") or {}
+            ragas = payload.get("ragas") or {}
+            deepeval_p = folder / "generation_deepeval.json"
+            de = json.loads(deepeval_p.read_text(encoding="utf-8")) if deepeval_p.is_file() else {}
+            de_overall = de.get("overall") or {}
+            p50_ms = custom.get("latency_p50_ms")
+            p50_s = f"{p50_ms / 1000.0:.1f}s" if isinstance(p50_ms, (int, float)) else None
+            abstain_p = custom.get("abstention_precision")
+            abstain_r = custom.get("abstention_recall")
+            abstain_str = (
+                f"{abstain_p:.2f} / {abstain_r:.2f}"
+                if isinstance(abstain_p, (int, float)) and isinstance(abstain_r, (int, float))
+                else None
+            )
+            l2_table.append(
                 {
+                    "run": name,
+                    "profile": payload.get("profile"),
+                    "split": payload.get("split"),
+                    "n": payload.get("n"),
+                    "RAGAS faith": _round3(ragas.get("faithfulness")),
+                    "groundedness": _round3(custom.get("mean_groundedness")),
+                    "route acc": _round3(custom.get("route_accuracy")),
+                    "cite valid": _round3(custom.get("citation_validity")),
+                    "abstain P/R": abstain_str,
+                    "latency p50": p50_s,
+                    "DeepEval faith": _round3(de_overall.get("faithfulness")),
+                }
+            )
+        if l2_table:
+            st.dataframe(l2_table, hide_index=True, width="stretch")
+            for name in picked_l2:
+                folder = root / name
+                with st.expander(f"Metrics Breakdown & Agreement: {name}", expanded=False):
+                    col_r, col_d = st.columns(2)
+                    ragas_p = folder / "generation_ragas.json"
+                    if ragas_p.is_file():
+                        r_data = (
+                            json.loads(ragas_p.read_text(encoding="utf-8")).get("overall") or {}
+                        )
+                        with col_r:
+                            st.markdown("**RAGAS Metrics**")
+                            st.dataframe(
+                                [
+                                    {
+                                        "Metric": k,
+                                        "Value": _round3(v) if isinstance(v, float) else v,
+                                    }
+                                    for k, v in r_data.items()
+                                ],
+                                hide_index=True,
+                                width="stretch",
+                            )
+                    deepeval_p = folder / "generation_deepeval.json"
+                    if deepeval_p.is_file():
+                        d_data = (
+                            json.loads(deepeval_p.read_text(encoding="utf-8")).get("overall") or {}
+                        )
+                        with col_d:
+                            st.markdown("**DeepEval Metrics**")
+                            st.dataframe(
+                                [
+                                    {
+                                        "Metric": k,
+                                        "Value": _round3(v) if isinstance(v, float) else v,
+                                    }
+                                    for k, v in d_data.items()
+                                ],
+                                hide_index=True,
+                                width="stretch",
+                            )
+                    agree_p = folder / "framework_agreement.md"
+                    if agree_p.is_file():
+                        st.markdown("**Framework Agreement (Spearman Correlation)**")
+                        st.markdown(agree_p.read_text(encoding="utf-8"))
+
+    if l1_runs:
+        st.markdown("### L1 Retrieval Runs")
+        picked_l1 = st.multiselect(
+            "Select L1 runs to compare", l1_runs, default=l1_runs[: min(5, len(l1_runs))]
+        )
+        l1_table: list[dict[str, object]] = []
+        for name in picked_l1:
+            folder = root / name
+            payload = json.loads((folder / "retrieval_metrics.json").read_text(encoding="utf-8"))
+            overall = payload.get("overall") or {}
+            l1_table.append(
+                {
+                    "run": name,
+                    "profile": payload.get("profile"),
                     "hit@5": overall.get("hit@5"),
+                    "r@5": overall.get("r@5"),
                     "r@10": overall.get("r@10"),
+                    "p@5": overall.get("p@5"),
                     "ndcg@10": overall.get("ndcg@10"),
                     "mrr": overall.get("mrr"),
                 }
             )
-        if l2.is_file():
-            payload = json.loads(l2.read_text())
-            ragas = payload.get("ragas") or {}
-            custom = payload.get("custom") or {}
-            row.update(
-                {
-                    "faithfulness": ragas.get("faithfulness"),
-                    "route_accuracy": custom.get("route_accuracy"),
-                    "latency_p50_ms": custom.get("latency_p50_ms"),
-                }
-            )
-        table.append(row)
-    if table:
-        st.dataframe(table, hide_index=True, width="stretch")
+        if l1_table:
+            st.dataframe(l1_table, hide_index=True, width="stretch")
 
 
 def analytics_page(client: RagClient) -> None:
