@@ -49,6 +49,7 @@ class QueryService:
             profile=cfg.profile,
             retrieved_chunk_ids=list(state.get("ranked_ids") or state.get("candidate_ids") or []),
             cited_chunk_ids=[c.chunk_id for c in answer.citations],
+            cited_doc_ids=list(dict.fromkeys(c.doc_id for c in answer.citations if c.doc_id)),
             answer=answer.text,
             abstained=answer.abstained,
             groundedness=answer.groundedness,

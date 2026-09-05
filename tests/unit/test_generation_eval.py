@@ -19,7 +19,7 @@ from docintel.evaluation.frameworks.deepeval_adapter import LangchainJudge
 from docintel.evaluation.frameworks.ragas_adapter import RagasEvaluator
 from docintel.evaluation.generation_eval import run_generation_eval
 from docintel.evaluation.gold import QAItem
-from docintel.evaluation.tracking import mlflow_run
+from docintel.evaluation.tracking import mlflow_run, resolve_tracking_uri
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -253,3 +253,38 @@ def test_mlflow_disabled_yields_none(tmp_path: Path) -> None:
     cfg.tracking.mlflow.enabled = False
     with mlflow_run(cfg, repo_root=tmp_path, split="dev", layer="L2") as run_id:
         assert run_id is None
+
+
+def test_resolve_tracking_uri_sqlite_and_file(tmp_path: Path) -> None:
+    sqlite = resolve_tracking_uri("sqlite:///mlflow.db", tmp_path)
+    assert sqlite.startswith("sqlite:///")
+    assert sqlite.endswith("mlflow.db")
+    file_uri = resolve_tracking_uri("file:./mlruns", tmp_path)
+    assert file_uri.startswith("file:")
+    assert "mlruns" in file_uri
+
+
+def test_mlflow_setup_error_yields_none_not_raise(tmp_path: Path, monkeypatch) -> None:
+    import mlflow
+
+    cfg = load_config("dev_cpu", repo_root=ROOT)
+    cfg = cfg.model_copy(update={"tracking": cfg.tracking.model_copy(deep=True)})
+    cfg.tracking.mlflow.enabled = True
+
+    def _boom(uri: str) -> None:
+        raise RuntimeError(f"file store blocked {uri}")
+
+    monkeypatch.setattr(mlflow, "set_tracking_uri", _boom)
+    with mlflow_run(cfg, repo_root=tmp_path, split="dev", layer="L2") as run_id:
+        assert run_id is None
+
+
+def test_mlflow_run_does_not_swallow_body_errors(tmp_path: Path) -> None:
+    cfg = load_config("dev_cpu", repo_root=ROOT)
+    cfg = cfg.model_copy(update={"tracking": cfg.tracking.model_copy(deep=True)})
+    cfg.tracking.mlflow.enabled = True
+    cfg.tracking.mlflow.tracking_uri = "sqlite:///mlflow_test.db"
+    with pytest.raises(RuntimeError, match="body"):
+        with mlflow_run(cfg, repo_root=tmp_path, split="dev", layer="L2") as run_id:
+            assert run_id is not None
+            raise RuntimeError("body failed")

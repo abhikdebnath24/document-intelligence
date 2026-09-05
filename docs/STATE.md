@@ -5,7 +5,7 @@ working session. One line per task; keep history in the changelog at the bottom.
 
 Status legend: `[ ]` pending  `[~]` in progress  `[x]` done  `[-]` dropped / deferred
 
-Last updated: 2026-09-05 (WS5 COMMIT: both judge stacks stay; L2 live still Windows)
+Last updated: 2026-09-05 (pulled custom L2 `e17ac23`; WS6 + MLflow sqlite COMMIT)
 
 ---
 
@@ -18,13 +18,13 @@ Last updated: 2026-09-05 (WS5 COMMIT: both judge stacks stay; L2 live still Wind
 | WS2 Ingestion | [x] | C2 = `5be2905` (Windows cleanup + embedding API). `gpu_default` nomic 400-doc ingest finished |
 | WS3 Retrieval + L1 eval | [x] | Dev L1 on origin (`523d1cd`). Sparse leads; bge-m3 helps hybrid; bge-base loses to RRF. C3 not ticked |
 | WS4 LLM + agentic graph | [x] | Live cited / abstain / general on Windows `gpu_default`. Two curated traces in this commit. C4 not published |
-| WS5 Generation eval (RAGAS + DeepEval) + MLflow + ablations | [~] | Both stacks shipped (RAGAS headline, DeepEval cross-check). No L2 numbers yet |
-| WS6 Feedback DB | [ ] | |
+| WS5 Generation eval (RAGAS + DeepEval) + MLflow + ablations | [~] | Custom L2 on origin (`e17ac23`, hash `cd2a4652f434`). RAGAS / DeepEval / MLflow still open |
+| WS6 Feedback DB | [x] | SQLAlchemy 2 + analytics. C6 COMMIT this session; not published |
 | WS7 Streamlit (incl. Upload PDF) | [ ] | |
 | WS8 FastAPI + Qdrant server + load test | [-] | MAY / write-up next step. Docker not required |
 | WS9 Write-up + video | [ ] | |
 
-Current focus: Windows L2 on `qa_dev`. Headline pass `--framework ragas`; agreement pass `--framework all`. Do not lock `evals/finalists.txt` or run `--split test`
+Current focus: Windows -- reuse `generation_outputs.jsonl` (do not delete). Re-run `--framework custom` once for MLflow sqlite, then `--framework all`. Do not lock `evals/finalists.txt` or `--split test`
 
 Publish gates (tick only after personal-machine push + Mac `git fetch`):
 
@@ -85,7 +85,7 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 - Data: `data/CUAD_v1/` (gitignored, 168 MB unzipped)
 - Hardware: macOS for writing code + `dev_cpu` smoke runs; Windows (Core Ultra 7, RTX 5060 8 GB) for ingest, ablations, evals, demo
 - Windows GPU check: passed 2026-09-04. `2.11.0+cu128 True NVIDIA GeForce RTX 5060 Laptop GPU`
-- MLflow UI: `uv run mlflow ui --backend-store-uri file:./mlruns` (mlruns/ gitignored)
+- MLflow UI: `uv run mlflow ui --backend-store-uri sqlite:///mlflow.db` (`mlflow.db` gitignored). MLflow 3.15 rejects `file:./mlruns` unless `MLFLOW_ALLOW_FILE_STORE=true`
 
 ---
 
@@ -173,6 +173,8 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 - [x] `scripts/run_demo_queries.py` + `scripts/error_analysis.py` (no live outputs yet)
 - [x] unit tests: sample builder, custom metrics, agreement, fake RAGAS metric, kwargs gating, custom-only mode, schema-aware judge, L2 test gate (88 passed; mypy strict clean)
 - [x] review vs installed ragas 0.4.3 / deepeval 4.2.0: vertexai import shim, explicit `provider=`, per-sample missing-input skips (see changelog)
+- [x] Windows `--framework custom` on `qa_dev` n=40 (`e17ac23`): route_accuracy 1.0, abstention P/R 0.4 / 0.75, citation_validity 1.0, mean_groundedness 0.605, latency p50 48078 ms / p95 67375 ms, llm_calls_per_query 6.5. `generation_outputs.jsonl` local (gitignored). MLflow failed (file store); `generation_metrics.json` missing
+- [x] MLflow store switched to `sqlite:///mlflow.db` (3.15 rejects `file:./mlruns`). `config_hash` unchanged. Setup errors no longer abort L2; body errors still raise
 - [ ] ablation ladder on `qa_dev`: rows 1-3 + 7 (MUST), rows 4-5 (SHOULD), rows 6, 8 (MAY). Windows only
 - [ ] `evals/finalists.txt` locked; finalists run once on `qa_test` (L1 + RAGAS)
 - [ ] `results/framework_agreement.md` (RAGAS vs DeepEval; SHOULD)
@@ -185,10 +187,12 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 
 ## WS6: Feedback DB
 
-- [ ] SQLAlchemy models: documents, query_logs, feedback
-- [ ] repository ABC + SQLAlchemy impl; `FeedbackService`
-- [ ] `scripts/analyze_feedback.py`
-- [ ] tests (in-memory SQLite)
+- [x] SQLAlchemy 2.0 models: `documents` (same columns as ingest `DocumentRegistry`), `query_logs`, `feedback`
+- [x] `BaseFeedbackRepository` + `SqlAlchemyFeedbackRepository`; `FeedbackService.log_query` / `rate` (thumbs `-1`/`1` plus 1-5; tag allowlist)
+- [x] `scripts/analyze_feedback.py`: rating by route / agreement type / config hash; worst queries; `--csv`
+- [x] tests: in-memory SQLite + shared-file check with ingest `DocumentRegistry` (5 passed; 99 total); mypy strict on `docintel.feedback` + `docintel.service`
+- [x] review: db path is CWD-relative like the ingest registry / `.qdrant` (was `repo_root`-anchored -> two `docintel.db` files when cwd != root); unused ORM relationships removed (merge cascade risk); no mypy ignore for sqlalchemy
+- [x] **C6 COMMIT**: this session (noreply). Same `docintel.db` as ingest; `docintel.db` / `mlflow.db` stay gitignored
 - [ ] **C6 PUBLISH** (skip if WS6 deferred)
 
 ## WS7: Streamlit
@@ -274,3 +278,6 @@ Publish gates (tick only after personal-machine push + Mac `git fetch`):
 | 2026-09-05 | WS5 Mac: RAGAS 0.4 collections `ascore()` + DeepEval schema-aware judge + custom metrics + MLflow tracking + L2 runner. Pin `ragas>=0.4.3,<0.5` and `deepeval>=3.0,<5`. No `qa_test`, no finalists. |
 | 2026-09-05 | WS5 review against installed ragas 0.4.3 / deepeval 4.2.0: `import ragas` breaks on `langchain_community.chat_models.vertexai` (gone in community 0.4) -> stub module shim; `llm_factory` does NOT infer provider from the client (default `openai`) -> pass `provider=`; reference/context-based metrics skipped per sample when gold or contexts are missing instead of scoring `""`; `--framework custom` no longer falls back to config frameworks; MLflow `file:./mlruns` anchored to repo root; L1 error-analysis picks the matching config hash; `tokens_per_query` omitted when usage is not captured; `eval` CLI catches `MissingSecretError`; `answer_relevancy` dropped from RAGAS list (needs embeddings client). mypy strict clean on `docintel.evaluation`. 88 tests. |
 | 2026-09-05 | Keep both judge stacks. RAGAS = write-up faithfulness. DeepEval = agreement report + answer/contextual relevancy. `--framework all` is the honesty path; default config stays `[ragas]`. C4 traces + WS5 code COMMIT on Mac. |
+| 2026-09-05 | WS6: SQLAlchemy feedback on the ingest `documents` table (column-compatible), plus `query_logs` / `feedback`. `sqlalchemy` moved to main deps. Analytics joins `cited_doc_ids`. QueryService now fills `cited_doc_ids` from citations. |
+| 2026-09-05 | MLflow 3.15 rejects `file:./mlruns`. Default `tracking_uri` is `sqlite:///mlflow.db` (not in `config_hash`). Setup errors skip tracking; caller-body errors still raise. |
+| 2026-09-05 | Pulled `e17ac23` (Gmail author, Windows): custom L2 artifacts under `results/gpu_default_dev_cd2a4652f434_L2/`. |

@@ -905,6 +905,7 @@ dependencies = [
     { name = "pyyaml" },
     { name = "qdrant-client" },
     { name = "rapidfuzz" },
+    { name = "sqlalchemy" },
     { name = "structlog" },
     { name = "typer" },
 ]
@@ -942,9 +943,6 @@ gpu = [
     { name = "torch", version = "2.13.0", source = { registry = "https://pypi.org/simple" }, marker = "sys_platform != 'darwin' and sys_platform != 'win32'" },
     { name = "torch", version = "2.14.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
 ]
-llm = [
-    { name = "sqlalchemy" },
-]
 phoenix = [
     { name = "arize-phoenix" },
     { name = "openinference-instrumentation-langchain" },
@@ -964,6 +962,7 @@ requires-dist = [
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "qdrant-client", specifier = ">=1.12" },
     { name = "rapidfuzz", specifier = ">=3.11" },
+    { name = "sqlalchemy", specifier = ">=2.0" },
     { name = "structlog", specifier = ">=24.4" },
     { name = "typer", specifier = ">=0.15" },
 ]
@@ -1001,7 +1000,6 @@ gpu = [
     { name = "torch", marker = "sys_platform == 'darwin'", specifier = ">=2.7", index = "https://download.pytorch.org/whl/cpu" },
     { name = "torch", marker = "sys_platform == 'win32'", specifier = ">=2.7", index = "https://download.pytorch.org/whl/cu128" },
 ]
-llm = [{ name = "sqlalchemy", specifier = ">=2.0" }]
 phoenix = [
     { name = "arize-phoenix", specifier = ">=8.0" },
     { name = "openinference-instrumentation-langchain", specifier = ">=0.1" },

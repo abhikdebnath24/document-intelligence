@@ -121,7 +121,7 @@ evaluation:
 tracking:
   mlflow:
     enabled: true
-    tracking_uri: file:./mlruns
+    tracking_uri: sqlite:///mlflow.db
     experiment: docintel
     log_traces: true
 

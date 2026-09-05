@@ -665,7 +665,7 @@ evaluation:
 tracking:
   mlflow:
     enabled: true
-    tracking_uri: file:./mlruns        # or sqlite:///mlflow.db ; `mlflow ui` to view
+    tracking_uri: sqlite:///mlflow.db  # MLflow 3.15 rejects file:./mlruns without MLFLOW_ALLOW_FILE_STORE
     experiment: docintel
     log_traces: true                   # mlflow.langchain.autolog()
 
@@ -890,7 +890,7 @@ Exact model ids are config values, not code. Pinned ids preferred over aliases.
 | Sparse | fastembed BM25 (`Qdrant/bm25`) default; in-proc BM25 fallback | bge-m3 sparse / SPLADE (optional, slower) |
 | Eval (generation) | RAGAS 0.4.x and DeepEval, both behind `BaseGenerationEvaluator` | TruLens (RAG triad; heavier), Arize Phoenix evals, ARES, promptfoo (see 8.6) |
 | Eval (retrieval) | custom deterministic metrics from CUAD spans | BEIR tooling (overkill) |
-| Experiment tracking | MLflow local (`file:./mlruns`), params = resolved config, metrics = L1/L2, artifacts = results dir | W&B (hosted) |
+| Experiment tracking | MLflow local (`sqlite:///mlflow.db`), params = resolved config, metrics = L1/L2, artifacts = results dir | W&B (hosted) |
 | Tracing | JSONL app trace + MLflow LangGraph autolog; Phoenix optional | LangSmith (paid), hosted Langfuse (paid; self-host needs Postgres + ClickHouse) |
 | Lint/test | ruff, pytest, mypy (core modules) | |
 
@@ -1540,7 +1540,7 @@ uv run python scripts/run_retrieval_eval.py --profile exp_hybrid_rrf --split tes
 uv run python scripts/run_generation_eval.py --profile gpu_default --split test --framework ragas
 uv run python scripts/run_generation_eval.py --profile gpu_default --split test --framework deepeval  # optional cross-check
 uv run python scripts/make_results_table.py
-uv run mlflow ui --backend-store-uri file:./mlruns                                    # runs + traces
+uv run mlflow ui --backend-store-uri sqlite:///mlflow.db                              # runs + traces
 
 uv run docintel query "Which state's law governs the Black Box Stocks distributor agreement?" --profile gpu_default
 uv run docintel verify-demo --profile gpu_default     # before recording

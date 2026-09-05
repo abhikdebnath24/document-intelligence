@@ -134,6 +134,7 @@ class QueryLog(BaseModel):
     token_usage: dict[str, int] = Field(default_factory=dict)
     llm_calls: int = 0
     retrieved_contexts: list[str] = Field(default_factory=list)
+    cited_doc_ids: list[str] = Field(default_factory=list)
     trace_path: str | None = None
 
 
@@ -143,3 +144,4 @@ class Feedback(BaseModel):
     rating: int
     tags: list[str] = Field(default_factory=list)
     comment: str | None = None
+    corrected_citation: dict[str, Any] | None = None

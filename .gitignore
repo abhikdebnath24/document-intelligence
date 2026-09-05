@@ -225,6 +225,7 @@ __marimo__/
 mlruns/
 traces/
 docintel.db
+mlflow.db
 *.db-journal
 results/*/per_question.jsonl
 results/*/generation_outputs.jsonl

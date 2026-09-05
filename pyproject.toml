@@ -19,6 +19,7 @@ dependencies = [
     "langchain-openai>=0.3",
     "langchain-google-genai>=2.0",
     "langgraph>=0.2",
+    "sqlalchemy>=2.0",
 ]
 
 [project.scripts]
@@ -66,9 +67,6 @@ phoenix = [
     "arize-phoenix>=8.0",
     "openinference-instrumentation-langchain>=0.1",
 ]
-llm = [
-    "sqlalchemy>=2.0",
-]
 
 [tool.uv.sources]
 torch = [
@@ -111,6 +109,7 @@ packages = [
     "docintel.llm",
     "docintel.agent",
     "docintel.service",
+    "docintel.feedback",
 ]
 
 [[tool.mypy.overrides]]

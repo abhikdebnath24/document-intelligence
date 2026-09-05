@@ -130,7 +130,7 @@ class MLflowConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     enabled: bool = True
-    tracking_uri: str = "file:./mlruns"
+    tracking_uri: str = "sqlite:///mlflow.db"
     experiment: str = "docintel"
     log_traces: bool = True
 

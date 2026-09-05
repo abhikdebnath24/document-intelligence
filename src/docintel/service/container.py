@@ -87,7 +87,9 @@ class Container:
             import mlflow
             import mlflow.langchain
 
-            mlflow.set_tracking_uri(cfg.tracking_uri)
+            from docintel.evaluation.tracking import resolve_tracking_uri
+
+            mlflow.set_tracking_uri(resolve_tracking_uri(cfg.tracking_uri, self.repo_root))
             mlflow.set_experiment(cfg.experiment)
             mlflow.langchain.autolog()
         except Exception:
