@@ -1,4 +1,4 @@
-# Mac smoke profile: 20 docs, tiny embedder, no reranker.
+# CPU smoke profile: 20 docs, tiny embedder, no reranker.
 corpus:
   limit_docs: 20
 
