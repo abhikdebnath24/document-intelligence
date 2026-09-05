@@ -2,6 +2,9 @@
 
 Agentic hybrid RAG over commercial contracts (CUAD v1).
 
+**Walkthrough video (5 min):** [Watch on Google Drive](https://drive.google.com/file/d/1JXZiCq8sLWTL2jpr8RnIVhK_4RVcdJV-/view?usp=drive_link)  
+**Technical write-up:** [`docs/WRITEUP.pdf`](docs/WRITEUP.pdf) / [`docs/WRITEUP.md`](docs/WRITEUP.md)
+
 The system answers natural-language questions over the corpus, cites page-level evidence, abstains when the knowledge base does not support an answer, and answers ordinary world-knowledge questions from the LLM with a disclaimer. Every ingestion, retrieval, and generation stage is selected by YAML profile.
 
 Package name and CLI: `docintel`. Python **3.12** (not 3.13). Pins live in [`pyproject.toml`](pyproject.toml) and [`uv.lock`](uv.lock).
@@ -419,6 +422,6 @@ uv run mypy
 | [`docs/WRITEUP.md`](docs/WRITEUP.md) | Same write-up as markdown |
 | [`docs/DATA.md`](docs/DATA.md) | CUAD join rules, split, known quirks |
 | [`evals/README.md`](evals/README.md) | Eval-set hashes and bucket counts |
-| [`results/README.md`](results/README.md) | L1 comparison table |
+| [`results/README.md`](results/README.md) | L1 / L2 comparison tables |
 
-Walkthrough video (5 min): add the public or unlisted URL here when recorded.
+**Walkthrough video (5 min):** [Google Drive](https://drive.google.com/file/d/1JXZiCq8sLWTL2jpr8RnIVhK_4RVcdJV-/view?usp=drive_link)
