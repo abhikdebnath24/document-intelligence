@@ -131,4 +131,7 @@ def test_prompt_versions_loaded() -> None:
     assert bank.get("generate").text.startswith("Answer using only")
     assert "untrusted" in bank.get("generate").text
     assert "<evidence" in bank.get("grade_batch").text or "evidence" in bank.get("grade_batch").text
-    assert bank.versions()["classify"] == "classify-v1"
+    assert bank.versions()["classify"] == "classify-v2"
+    assert "ordinary factual" in bank.get("classify").text
+    assert "Do not refuse these" in bank.get("classify").text
+    assert bank.versions()["general"] == "general-v2"

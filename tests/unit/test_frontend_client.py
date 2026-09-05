@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from frontend.streamlit_app.client import InProcessClient
+from frontend.streamlit_app.client import InProcessClient, run_pdf_ingest
 
 from docintel.config import load_config
 from docintel.core.types import QueryLog
@@ -38,3 +38,36 @@ def test_client_is_lazy_and_updates_one_feedback_row() -> None:
     assert rows[0].tags == ["good"]
     assert rows[0].comment == "fixed"
     client.close()
+
+
+def test_run_pdf_ingest_upserts_and_reports_chunks(tmp_path: Path) -> None:
+    import pymupdf
+
+    from docintel.ingestion.pipeline import IngestReport
+
+    src = tmp_path / "src.pdf"
+    doc = pymupdf.open()  # type: ignore[no-untyped-call]
+    doc.new_page()
+    doc.save(src)
+    doc.close()
+
+    seen: list[Path] = []
+
+    class _Fake:
+        repo_root = tmp_path
+
+        def ingest_paths(self, paths: list[Path]) -> IngestReport:
+            seen.extend(paths)
+            return IngestReport(
+                profile="gpu_default",
+                index_sig="sig",
+                collection="col",
+                indexed=1,
+                chunks=4,
+            )
+
+    out = run_pdf_ingest(_Fake(), src.read_bytes())  # type: ignore[arg-type]
+    assert out["chunks"] == 4
+    assert out["indexed"] == 1
+    assert out["collection"] == "col"
+    assert seen and seen[0].parent == tmp_path / "data" / "uploads"

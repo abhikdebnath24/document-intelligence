@@ -17,7 +17,21 @@ from docintel.feedback.repository import SqlAlchemyFeedbackRepository
 from docintel.service.feedback_service import FeedbackService
 from docintel.settings import load_settings
 
-st.set_page_config(page_title="docintel", layout="wide")
+st.set_page_config(
+    page_title="Document Intelligence - Ask the Corpus",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+_CSS = """
+<style>
+    .block-container { padding-top: 1.6rem; padding-bottom: 5rem; max-width: 1400px; }
+    [data-testid="stHeader"] { background: transparent; }
+    [data-testid="stSidebar"] { background: #10151c; }
+    h1 { letter-spacing: -0.03em; font-weight: 650; }
+    .stChatMessage { background: #151b23; border: 1px solid #243041; border-radius: 12px; }
+</style>
+"""
 
 
 def _profiles() -> list[str]:
@@ -55,9 +69,13 @@ def page_feedback() -> None:
     analytics_page(st.session_state.client)
 
 
+st.markdown(_CSS, unsafe_allow_html=True)
+
 profiles = _profiles()
 default = load_settings().docintel_profile
 idx = profiles.index(default) if default in profiles else 0
+st.sidebar.markdown("**Document Intelligence**")
+st.sidebar.caption("Ask the Corpus")
 profile = st.sidebar.selectbox("profile", profiles, index=idx)
 
 if st.session_state.get("active_profile") != profile:
@@ -73,14 +91,17 @@ except Exception as exc:
 
 st.sidebar.caption(f"backend={st.session_state.client.config.frontend.backend}")
 
+pg_chat = st.Page(page_chat, title="Ask the Corpus", default=True)
+pg_docs = st.Page(page_documents, title="Documents")
+pg_exp = st.Page(page_experiments, title="Experiments")
+pg_fb = st.Page(page_feedback, title="Feedback")
 page = st.navigation(
     {
-        "Query": [st.Page(page_chat, title="Chat", default=True)],
-        "Corpus": [st.Page(page_documents, title="Documents")],
-        "Eval": [
-            st.Page(page_experiments, title="Experiments"),
-            st.Page(page_feedback, title="Feedback"),
-        ],
+        "Query": [pg_chat],
+        "Corpus": [pg_docs],
+        "Eval": [pg_exp, pg_fb],
     }
 )
+if st.sidebar.button("Upload a contract", width="stretch"):
+    st.switch_page(pg_docs)
 page.run()

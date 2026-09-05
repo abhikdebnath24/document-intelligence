@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Protocol
@@ -12,7 +13,7 @@ from docintel.ingestion.pipeline import IngestReport
 from docintel.ingestion.registry_store import DocumentRegistry
 from docintel.service.container import Container
 from docintel.service.feedback_service import FeedbackService
-from docintel.service.ingest_service import IngestService
+from docintel.service.ingest_service import IngestService, save_upload
 from docintel.service.query_service import QueryService
 
 log_ = get_logger(__name__)
@@ -127,6 +128,24 @@ class InProcessClient:
         closer = getattr(self.feedback.repo, "close", None)
         if closer:
             closer()
+
+
+def run_pdf_ingest(client: RagClient, raw: bytes) -> dict[str, object]:
+    t0 = time.perf_counter()
+    path = save_upload(raw, client.repo_root / "data" / "uploads")
+    report = client.ingest_paths([path])
+    elapsed = time.perf_counter() - t0
+    if report.failed:
+        detail = "; ".join(f"{row['doc_id']}: {row['error']}" for row in report.failed)
+        raise RuntimeError(detail)
+    return {
+        "doc_id": path.stem,
+        "chunks": report.chunks,
+        "indexed": report.indexed,
+        "skipped": report.skipped,
+        "seconds": round(elapsed, 1),
+        "collection": report.collection,
+    }
 
 
 class HttpClient:
