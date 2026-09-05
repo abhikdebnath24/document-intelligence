@@ -4,7 +4,7 @@ Agentic hybrid RAG over commercial contracts (CUAD v1).
 
 The system answers natural-language questions over the corpus, cites page-level evidence, abstains when the knowledge base does not support an answer, and answers ordinary world-knowledge questions from the LLM with a disclaimer. Every ingestion, retrieval, and generation stage is selected by YAML profile.
 
-Package name and CLI: `docintel`.
+Package name and CLI: `docintel`. Python **3.12** (not 3.13). Pins live in [`pyproject.toml`](pyproject.toml) and [`uv.lock`](uv.lock).
 
 ```text
 PDF corpus  ->  load / chunk / embed  ->  Qdrant (dense + BM25)
@@ -14,7 +14,19 @@ question -> LangGraph (route, retrieve, grade, rewrite, verify, abstain)
                          cited answer | abstain | general | refuse
 ```
 
-Design: [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md). Data: [`docs/DATA.md`](docs/DATA.md).
+Design: [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md). Data rules: [`docs/DATA.md`](docs/DATA.md).
+
+---
+
+## Problem and approach
+
+**Problem.** A legal / ops team sits on hundreds of commercial contracts and needs clause-level answers (governing law, termination, exclusivity, fee waivers) with a page cite. A fluent paragraph without evidence is a liability. The system must also refuse when the corpus does not support the claim.
+
+**Domain.** Enterprise document intelligence: SEC-filed commercial agreements, 41 clause types.
+
+**Approach.** Retrieval-augmented generation with a LangGraph control loop (classify, hybrid retrieve, grade, rewrite, generate with forced citations, verify, abstain). Track D (RAG / LLM knowledge systems) on enterprise documents (S2). Not a fine-tune: the labels are extractive spans, the corpus is already gold, and the failure mode that matters is unsupported generation.
+
+**Data.** [CUAD v1](https://zenodo.org/records/4595826) (The Atticus Project, CC BY 4.0). 510 contracts, lawyer-labelled spans. The zip is not in git. Download it into `data/CUAD_v1/` (below) before ingest, query, UI, or eval.
 
 ---
 
@@ -56,6 +68,8 @@ cd document-intelligence
 cp .env.example .env
 ```
 
+Then download CUAD into `data/CUAD_v1/` (see [Data](#data)). Ingest, query, UI, and eval all read that path. Without it, `docintel ingest` has nothing to index.
+
 Edit `.env`:
 
 ```dotenv
@@ -87,21 +101,68 @@ uv run pytest tests/unit
 
 `doctor` prints device, embedder load, and Qdrant collection presence.
 
+### Reproduce end-to-end
+
+1. Clone, `cp .env.example .env`, put keys in `.env`.
+2. Download and unzip CUAD so `data/CUAD_v1/full_contract_pdf/` exists ([Data](#data)).
+3. `uv sync --group dev --group gpu --group frontend` (add `--group eval` to rerun L2).
+4. `uv run pytest tests/unit`
+5. `uv run docintel ingest --profile gpu_default` (400-doc index into `.qdrant`).
+6. `uv run docintel query --profile gpu_default "Which jurisdiction's law governs the Stampscominc Sponsorship Agreement?"`
+7. `uv run docintel serve --profile gpu_default` for the UI.
+8. Optional rerun of numbers already committed under `results/`:
+
+```bash
+uv run docintel eval --profile gpu_default --layer L1 --split dev
+uv run docintel eval --profile gpu_default --layer L2 --split dev --framework all
+```
+
+Headline L2 is RAGAS faithfulness **0.636** in `results/gpu_default_dev_cd2a4652f434_L2/`. Tables: [`results/README.md`](results/README.md).
+
 ---
 
 ## Data
 
-CUAD v1, CC BY 4.0 ([Zenodo record 4595826](https://zenodo.org/records/4595826), `CUAD_v1.zip`).
+CUAD is gitignored (`/data/` in `.gitignore`). The workflow reads it from the working tree at `data/CUAD_v1/`. Do not commit the zip or the extract.
+
+### Download and place
+
+From the repo root, after `git clone`:
+
+```bash
+mkdir -p data
+curl -L -o data/CUAD_v1.zip \
+  "https://zenodo.org/records/4595826/files/CUAD_v1.zip?download=1"
+# 105883672 bytes, md5 c38f490a984420b8a62600db401fafd5
+unzip -q data/CUAD_v1.zip -d data
+rm data/CUAD_v1.zip
+```
+
+The zip root is `CUAD_v1/`. After unzip, this path must exist:
+
+`data/CUAD_v1/full_contract_pdf`
+
+If you instead see `data/CUAD_v1/CUAD_v1/full_contract_pdf`, move the inner folder up one level. Config keys `corpus.pdf_root` and `corpus.txt_root` in `configs/base.yaml` point here; ingest and eval will fail if the tree is nested or missing.
 
 ```text
-data/CUAD_v1/                  # gitignored
-  full_contract_pdf/           # walk by suffix; 311 files are .PDF
-  full_contract_txt/           # oracle only
+data/CUAD_v1/                  # local only, gitignored
+  full_contract_pdf/           # indexed. Walk by suffix; 311 files are .PDF
+  full_contract_txt/           # length / extraction oracle only
   master_clauses.csv           # gold spans (Python list reprs; ast.literal_eval)
   CUAD_v1.json                 # do not use answer_start
 ```
 
-Unzip so `data/CUAD_v1/full_contract_pdf/` exists. The committed manifest already selected the subset:
+Check the extract:
+
+```bash
+test -f data/CUAD_v1/master_clauses.csv
+test -d data/CUAD_v1/full_contract_pdf
+python -c "from pathlib import Path; print(sum(1 for p in Path('data/CUAD_v1/full_contract_pdf').rglob('*') if p.suffix.lower()=='.pdf'))"
+```
+
+Expect `510` PDFs. Browser download of the same zip from [Zenodo record 4595826](https://zenodo.org/records/4595826) is fine; still unpack so `data/CUAD_v1/full_contract_pdf/` exists.
+
+The committed manifest already selected the subset:
 
 | Set | Count | Role |
 |-----|------:|------|
@@ -357,3 +418,5 @@ uv run mypy
 | [`docs/DATA.md`](docs/DATA.md) | CUAD join rules, split, known quirks |
 | [`evals/README.md`](evals/README.md) | Eval-set hashes and bucket counts |
 | [`results/README.md`](results/README.md) | L1 comparison table |
+
+Walkthrough video (5 min): add the public or unlisted URL here when recorded. Technical write-up (1-2 pages): add the PDF path or URL here.
